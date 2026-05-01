@@ -8,7 +8,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between">
       <Hero />
       
-      <div className="w-full flex flex-col items-center">
+      <div className="w-full flex flex-col items-center relative z-20 bg-black">
         <SectionReveal title="Welcome">
           <div className="max-w-3xl text-lg md:text-xl text-gray-300 space-y-6 leading-relaxed font-light">
             <p>
