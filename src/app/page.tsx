@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import SectionReveal from "@/components/SectionReveal";
+import WelcomeSequence from "@/components/WelcomeSequence";
 import ProjectsAccordion from "@/components/ProjectsAccordion";
 import MagneticButton from "@/components/MagneticButton";
 
@@ -9,17 +10,7 @@ export default function Home() {
       <Hero />
       
       <div className="w-full flex flex-col items-center relative z-20 bg-black">
-        <SectionReveal title="Welcome">
-          <div className="max-w-3xl text-lg md:text-xl text-gray-300 space-y-6 leading-relaxed font-light">
-            <p>
-              I am an Expert Creative Developer specializing in high-performance, GSAP-driven interactive experiences. 
-              My focus is on merging cyber-minimalist aesthetics with cutting-edge web technologies to create digital spaces that feel alive.
-            </p>
-            <p>
-              By leveraging Next.js, Tailwind CSS, and advanced animations, I build scalable applications that do not compromise on visual excellence or user engagement.
-            </p>
-          </div>
-        </SectionReveal>
+        <WelcomeSequence />
 
         <SectionReveal title="Skills">
           <div className="flex flex-wrap gap-4 mt-8">

@@ -9,7 +9,6 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLElement>(null);
   const windowRef = useRef<HTMLDivElement>(null);
   const blackScreenRef = useRef<HTMLDivElement>(null);
@@ -19,8 +18,10 @@ export default function Hero() {
   const rightTextRef = useRef<HTMLHeadingElement>(null);
 
   useGSAP(() => {
-    if (!containerRef.current || !wrapperRef.current || !windowRef.current) return;
+    if (!wrapperRef.current || !windowRef.current) return;
     
+    const wrapper = wrapperRef.current;
+
     // ----- Initial Black Screen Fade -----
     gsap.to(blackScreenRef.current, {
       opacity: 0,
@@ -33,22 +34,22 @@ export default function Hero() {
     });
 
     // ----- ScrollTrigger Expansion and Text Animation -----
-    // Using a CSS sticky container (300vh) allows perfect native overlapping by the next section.
-    // The timeline is mapped to 3 seconds, corresponding to 300vh of scroll.
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current,
+        trigger: wrapper,
         start: "top top",
-        end: "bottom top", // Scrubs from 0vh to 300vh
+        end: "+=200%", // Pin for exactly 200vh of scroll
+        pin: true,
+        pinSpacing: false, // Prevents GSAP from adding padding so the manual spacer works
         scrub: 1,
       }
     });
 
-    // 1. Expand the window (0 to 0.8s) -> 0 to 80vh of scroll
+    // 1. Expand the window (0 to 1.0s) -> 0 to 100vh of scroll
     tl.to(windowRef.current, {
       width: "100%",
       height: "100%",
-      duration: 0.8,
+      duration: 1.0,
       ease: "power2.inOut"
     }, 0);
 
@@ -60,29 +61,30 @@ export default function Hero() {
       ease: "power2.in"
     }, 0);
 
-    // 2. Existing text appears (1.0s to 1.6s) -> 100vh to 160vh of scroll
+    // 2. Existing text appears along with picture (0.5s to 1.0s)
     if (leftTextRef.current && rightTextRef.current) {
       tl.to([leftTextRef.current.children[0], rightTextRef.current.children[0]], {
         y: 0,
         opacity: 1,
-        duration: 0.6,
+        duration: 0.5,
         ease: "power2.out"
-      }, 1.0);
-
-      // 3. Text moves apart (2.0s to 3.0s) -> 200vh to 300vh of scroll
-      // The next section slides up from the bottom EXACTLY between 200vh and 300vh of scroll!
-      // This synchronizes the text parting perfectly with the next section sliding over.
-      tl.to(leftTextRef.current, { x: "15vw", ease: "none", duration: 1.0 }, 2.0)
-        .to(rightTextRef.current, { x: "-15vw", ease: "none", duration: 1.0 }, 2.0);
+      }, 0.5); // Finishes exactly as the image reaches full size
     }
 
-  }, { scope: containerRef });
+    // As the user scrolls from 100vh to 200vh, the next section slides up and covers the sticky hero.
+    // Exactly during this phase (1.0s to 2.0s), the text moves towards the center.
+    if (leftTextRef.current && rightTextRef.current) {
+      tl.to(leftTextRef.current, { x: "15vw", ease: "none", duration: 1.0 }, 1.0)
+        .to(rightTextRef.current, { x: "-15vw", ease: "none", duration: 1.0 }, 1.0);
+    }
+
+  }, { scope: wrapperRef });
 
   return (
-    <div ref={containerRef} className="w-full h-[300vh] relative z-0">
+    <>
       <section
         ref={wrapperRef}
-        className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[#f5f5f5]"
+        className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[#f5f5f5] z-0"
       >
         {/* Initial Black Screen */}
         <div ref={blackScreenRef} className="absolute inset-0 bg-black z-50 pointer-events-none" />
@@ -129,6 +131,9 @@ export default function Hero() {
         </div>
 
       </section>
-    </div>
+
+      {/* Manual Spacer: delays the next section from sliding over the Hero by 100vh */}
+      <div className="w-full h-[100vh] pointer-events-none bg-transparent" />
+    </>
   );
 }
