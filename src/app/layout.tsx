@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
-import Preloader from "@/components/Preloader";
-
 export const metadata: Metadata = {
   title: "Electric Minimalist Portfolio",
   description: "A high-energy, cyber-minimalist portfolio",
@@ -17,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased bg-black text-white">
       <body className="min-h-full flex flex-col font-sans">
-        <Preloader />
         <CustomCursor />
         <SmoothScroll>{children}</SmoothScroll>
       </body>

@@ -9,157 +9,126 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
-  const containerRef = useRef<HTMLElement>(null);
-  const circle1Ref = useRef<SVGCircleElement>(null);
-  const circle2Ref = useRef<SVGCircleElement>(null);
-  const circle3Ref = useRef<SVGCircleElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
+  const blackScreenRef = useRef<HTMLDivElement>(null);
+  const myPortfolioTextRef = useRef<HTMLDivElement>(null);
   
   const leftTextRef = useRef<HTMLHeadingElement>(null);
   const rightTextRef = useRef<HTMLHeadingElement>(null);
 
   useGSAP(() => {
-    if (!containerRef.current || !circle1Ref.current || !circle2Ref.current || !circle3Ref.current) return;
+    if (!containerRef.current || !wrapperRef.current || !windowRef.current) return;
     
-    const container = containerRef.current;
-    const c1 = circle1Ref.current;
-    const c2 = circle2Ref.current;
-    const c3 = circle3Ref.current;
+    // ----- Initial Black Screen Fade -----
+    gsap.to(blackScreenRef.current, {
+      opacity: 0,
+      duration: 0.5,
+      delay: 0.1,
+      ease: "power2.out",
+      onComplete: () => {
+        if (blackScreenRef.current) blackScreenRef.current.style.display = 'none';
+      }
+    });
 
-    // ----- Blob GSAP Setup -----
-    gsap.set([c1, c2, c3], { scale: 0, transformOrigin: "50% 50%" });
+    // ----- ScrollTrigger Expansion and Text Animation -----
+    // Using a CSS sticky container (300vh) allows perfect native overlapping by the next section.
+    // The timeline is mapped to 3 seconds, corresponding to 300vh of scroll.
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom top", // Scrubs from 0vh to 300vh
+        scrub: 1,
+      }
+    });
 
-    const x1To = gsap.quickTo(c1, "cx", { duration: 0.3, ease: "power3.out" });
-    const y1To = gsap.quickTo(c1, "cy", { duration: 0.3, ease: "power3.out" });
-    
-    const x2To = gsap.quickTo(c2, "cx", { duration: 0.7, ease: "power3.out" });
-    const y2To = gsap.quickTo(c2, "cy", { duration: 0.7, ease: "power3.out" });
-    
-    const x3To = gsap.quickTo(c3, "cx", { duration: 1.2, ease: "power3.out" });
-    const y3To = gsap.quickTo(c3, "cy", { duration: 1.2, ease: "power3.out" });
+    // 1. Expand the window (0 to 0.8s) -> 0 to 80vh of scroll
+    tl.to(windowRef.current, {
+      width: "100%",
+      height: "100%",
+      duration: 0.8,
+      ease: "power2.inOut"
+    }, 0);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      x1To(x); y1To(y);
-      x2To(x); y2To(y);
-      x3To(x); y3To(y);
-    };
+    // Fade out "My Portfolio" text
+    tl.to(myPortfolioTextRef.current, {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      ease: "power2.in"
+    }, 0);
 
-    const handleMouseEnter = () => {
-      gsap.to(c1, { scale: 1, duration: 0.8, ease: "back.out(1.5)" }); 
-      gsap.to(c2, { scale: 1, duration: 0.8, ease: "back.out(1.5)", delay: 0.05 }); 
-      gsap.to(c3, { scale: 1, duration: 0.8, ease: "back.out(1.5)", delay: 0.1 }); 
-    };
-    
-    const handleMouseLeave = () => {
-      gsap.to([c1, c2, c3], { scale: 0, duration: 0.5, ease: "power3.inOut" }); 
-    };
-
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseenter", handleMouseEnter);
-    container.addEventListener("mouseleave", handleMouseLeave);
-
-    // ----- Text Reveal Animation -----
+    // 2. Existing text appears (1.0s to 1.6s) -> 100vh to 160vh of scroll
     if (leftTextRef.current && rightTextRef.current) {
-      gsap.to([leftTextRef.current.children[0], rightTextRef.current.children[0]], {
+      tl.to([leftTextRef.current.children[0], rightTextRef.current.children[0]], {
         y: 0,
         opacity: 1,
-        duration: 1.2,
-        ease: "power3.out",
-        delay: 1.8, // Waits for preloader SVG animation + slide up
-      });
+        duration: 0.6,
+        ease: "power2.out"
+      }, 1.0);
 
-      // ----- ScrollTrigger Pinning and Text Movement -----
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: container,
-          start: "top top",
-          end: "+=100%", // Pin for 100vh of scrolling
-          pin: true,
-          pinSpacing: false, // The next section slides up over this!
-          scrub: 1, // Smooth scrub
-        }
-      });
-
-      tl.to(leftTextRef.current, { x: "15vw", ease: "none" }, 0)
-        .to(rightTextRef.current, { x: "-15vw", ease: "none" }, 0);
+      // 3. Text moves apart (2.0s to 3.0s) -> 200vh to 300vh of scroll
+      // The next section slides up from the bottom EXACTLY between 200vh and 300vh of scroll!
+      // This synchronizes the text parting perfectly with the next section sliding over.
+      tl.to(leftTextRef.current, { x: "15vw", ease: "none", duration: 1.0 }, 2.0)
+        .to(rightTextRef.current, { x: "-15vw", ease: "none", duration: 1.0 }, 2.0);
     }
 
-    return () => {
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseenter", handleMouseEnter);
-      container.removeEventListener("mouseleave", handleMouseLeave);
-    };
   }, { scope: containerRef });
 
   return (
-    <section
-      ref={containerRef}
-      className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-black"
-    >
-      {/* Background Image (me1.png) */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <Image
-          src="/images/hero/me1.png"
-          alt="Hero background"
-          fill
-          className="object-cover opacity-90"
-          priority
-        />
-      </div>
-
-      {/* Foreground Image (me2.png) revealed fluidly by SVG mask */}
-      <div
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
-        style={{
-          maskImage: 'url(#fluid-mask)',
-          WebkitMaskImage: 'url(#fluid-mask)',
-        }}
+    <div ref={containerRef} className="w-full h-[300vh] relative z-0">
+      <section
+        ref={wrapperRef}
+        className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[#f5f5f5]"
       >
-        <Image
-          src="/images/hero/me2.png"
-          alt="Hero reveal"
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
+        {/* Initial Black Screen */}
+        <div ref={blackScreenRef} className="absolute inset-0 bg-black z-50 pointer-events-none" />
 
-      {/* Typography layer */}
-      <div className="absolute w-full h-full inset-0 pointer-events-none flex items-center justify-between px-[2%] md:px-[4%] z-20">
-        <div className="overflow-hidden pr-8 pb-4 flex-shrink-0">
-          <h1 ref={leftTextRef} className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-widest text-black">
-            <span className="inline-block translate-y-[100%] opacity-0">BLESSON<br />JF</span>
-          </h1>
-        </div>
-        <div className="overflow-hidden pl-8 pb-4 text-right flex-shrink-0">
-          <h1 ref={rightTextRef} className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-widest text-black">
-            <span className="inline-block translate-y-[100%] opacity-0">FRONTEND<br />DEVELOPER</span>
-          </h1>
-        </div>
-      </div>
+        {/* The Expanding Window */}
+        <div 
+          ref={windowRef} 
+          className="relative w-[280px] h-[380px] md:w-[400px] md:h-[500px] overflow-hidden z-20"
+        >
+          {/* Inner Container: always 100vw/100vh, centered so it matches screen coordinates */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] bg-black">
+            
+            {/* Background Image (me1.png) */}
+            <div className="absolute inset-0 w-full h-full pointer-events-none">
+              <Image
+                src="/images/hero/me1.png"
+                alt="Hero background"
+                fill
+                className="object-cover opacity-90"
+                priority
+              />
+            </div>
 
-      {/* SVG Definitions for the true Liquid/Gooey Mask */}
-      <svg width="100%" height="100%" className="absolute pointer-events-none z-10 top-0 left-0">
-        <defs>
-          <filter id="goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -15" result="goo" />
-            <feBlend in="SourceGraphic" in2="goo" />
-          </filter>
-          
-          <mask id="fluid-mask">
-            <rect width="100%" height="100%" fill="black" />
-            <g filter="url(#goo)">
-              <circle ref={circle1Ref} cx="0" cy="0" r="160" fill="white" />
-              <circle ref={circle2Ref} cx="0" cy="0" r="110" fill="white" />
-              <circle ref={circle3Ref} cx="0" cy="0" r="80" fill="white" />
-            </g>
-          </mask>
-        </defs>
-      </svg>
-    </section>
+            {/* Typography layer */}
+            <div className="absolute w-full h-full inset-0 pointer-events-none flex items-center justify-between px-[2%] md:px-[4%] z-20">
+              <div className="overflow-hidden pr-8 pb-4 flex-shrink-0">
+                <h1 ref={leftTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-black leading-none md:leading-none lg:leading-none">
+                  <span className="inline-block translate-y-[100%] opacity-0 drop-shadow-md">BLESSON<br />JF</span>
+                </h1>
+              </div>
+              <div className="overflow-hidden pl-8 pb-4 text-right flex-shrink-0">
+                <h1 ref={rightTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-black leading-none md:leading-none lg:leading-none">
+                  <span className="inline-block translate-y-[100%] opacity-0 drop-shadow-md">FRONTEND<br />DEVELOPER</span>
+                </h1>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* "My Portfolio" Text positioned absolutely relative to wrapper so it stays below the window initially */}
+        <div ref={myPortfolioTextRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[210px] md:translate-y-[280px] z-10">
+          <p className="font-serif italic text-sm text-gray-800 tracking-wider">My Portfolio</p>
+        </div>
+
+      </section>
+    </div>
   );
 }
