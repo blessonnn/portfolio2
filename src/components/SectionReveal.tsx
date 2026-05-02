@@ -10,9 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
 interface SectionRevealProps {
   children: React.ReactNode;
   title: string;
+  fullWidth?: boolean;
 }
 
-export default function SectionReveal({ children, title }: SectionRevealProps) {
+export default function SectionReveal({ children, title, fullWidth = false }: SectionRevealProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
@@ -54,10 +55,10 @@ export default function SectionReveal({ children, title }: SectionRevealProps) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
+    <section ref={sectionRef} className={`py-24 ${fullWidth ? 'w-full' : 'px-6 md:px-12 max-w-7xl mx-auto'}`}>
       <h2
         ref={titleRef}
-        className="text-4xl md:text-6xl font-bold mb-12 tracking-tight transition-colors duration-300"
+        className={`text-4xl md:text-6xl font-bold mb-12 tracking-tight transition-colors duration-300 ${fullWidth ? 'px-6 md:px-12' : ''}`}
       >
         {title}
       </h2>

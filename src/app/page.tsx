@@ -22,7 +22,7 @@ export default function Home() {
           </div>
         </SectionReveal>
 
-        <SectionReveal title="Projects">
+        <SectionReveal title="Projects" fullWidth>
           <ProjectsAccordion />
         </SectionReveal>
 

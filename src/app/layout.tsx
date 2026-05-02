@@ -3,8 +3,11 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 export const metadata: Metadata = {
-  title: "Electric Minimalist Portfolio",
+  title: "Blesson Portfolio",
   description: "A high-energy, cyber-minimalist portfolio",
+  icons: {
+    icon: '/logo/logo-portfolio.png',
+  },
 };
 
 export default function RootLayout({
