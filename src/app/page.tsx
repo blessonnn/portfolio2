@@ -3,6 +3,7 @@ import SectionReveal from "@/components/SectionReveal";
 import WelcomeSequence from "@/components/WelcomeSequence";
 import ProjectsAccordion from "@/components/ProjectsAccordion";
 import MagneticButton from "@/components/MagneticButton";
+import SkillsMarquee from "@/components/SkillsMarquee";
 
 export default function Home() {
   return (
@@ -12,13 +13,9 @@ export default function Home() {
       <div className="w-full flex flex-col items-center relative z-20 bg-black">
         <WelcomeSequence />
 
-        <SectionReveal title="Skills">
-          <div className="flex flex-wrap gap-4 mt-8">
-            {["Next.js (App Router)", "TypeScript", "Tailwind CSS", "GSAP 3", "ScrollTrigger", "Lenis", "WebGL", "Framer Motion"].map((skill) => (
-              <span key={skill} className="px-6 py-3 border border-gray-800 rounded-full text-gray-300 hover:border-[var(--accent)] hover:text-white transition-colors duration-300 bg-[#0a0a0a]">
-                {skill}
-              </span>
-            ))}
+        <SectionReveal title="Skills" fullWidth>
+          <div className="mt-8 overflow-hidden w-full">
+            <SkillsMarquee />
           </div>
         </SectionReveal>
 
