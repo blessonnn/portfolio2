@@ -18,11 +18,35 @@ const languages = [
   "欢迎"
 ];
 
-const FRAME_COUNT = 28;
+const heyLanguages = [
+  "Hey",
+  "Hola",
+  "Salut",
+  "Hallo",
+  "Ciao",
+  "やあ",
+  "안녕",
+  "你好"
+];
+
+const allLanguages = [
+  "All",
+  "Todos",
+  "Tous",
+  "Alle",
+  "Tutti",
+  "みんな",
+  "여러분",
+  "大家"
+];
+
+const FRAME_COUNT = 40;
 
 export default function WelcomeSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  const heyRef = useRef<HTMLHeadingElement>(null);
+  const allRef = useRef<HTMLHeadingElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const imgContainerRef = useRef<HTMLDivElement>(null);
 
@@ -36,15 +60,16 @@ export default function WelcomeSequence() {
   }, []);
 
   useGSAP(() => {
-    if (!containerRef.current || !textRef.current || !imgRef.current || !imgContainerRef.current) return;
+    if (!containerRef.current || !textRef.current || !imgRef.current || !imgContainerRef.current || !heyRef.current || !allRef.current) return;
 
+    // Background Image Animation
     gsap.fromTo(imgContainerRef.current,
       {
         width: "24vw",
         height: "16vh",
-        top: "0%",
+        top: "100%",
         xPercent: -50,
-        yPercent: 0,
+        yPercent: -100, // Anchored at the bottom
         borderRadius: "0px",
       },
       {
@@ -52,13 +77,13 @@ export default function WelcomeSequence() {
         height: "100vh",
         top: "50%",
         xPercent: -50,
-        yPercent: -50,
+        yPercent: -50, // Moves to center
         borderRadius: "0px",
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom bottom", // Scrubs through the container's height
+          start: "top center", 
+          end: "bottom bottom",
           scrub: true,
           onUpdate: (self) => {
             const progress = self.progress;
@@ -79,6 +104,14 @@ export default function WelcomeSequence() {
               textRef.current.innerText = languages[textIndex];
             }
 
+            if (heyRef.current && heyRef.current.innerText !== heyLanguages[textIndex]) {
+              heyRef.current.innerText = heyLanguages[textIndex];
+            }
+
+            if (allRef.current && allRef.current.innerText !== allLanguages[textIndex]) {
+              allRef.current.innerText = allLanguages[textIndex];
+            }
+
             if (imgRef.current) {
               const frameStr = frameIndex.toString().padStart(3, "0");
               const newSrc = `/welcome-section/ezgif-frame-${frameStr}.jpg`;
@@ -90,10 +123,41 @@ export default function WelcomeSequence() {
         }
       }
     );
+
+    // "Hey" Text Animation (Sliding from left)
+    gsap.fromTo(heyRef.current,
+      { x: "-38vw", opacity: 1 },
+      { 
+        x: "-1.5rem", 
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top center",
+          end: "bottom bottom",
+          scrub: true,
+        }
+      }
+    );
+
+    // "All" Text Animation (Sliding from right)
+    gsap.fromTo(allRef.current,
+      { x: "38vw", opacity: 1 },
+      { 
+        x: "1.5rem", 
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top center",
+          end: "bottom bottom",
+          scrub: true,
+        }
+      }
+    );
+
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="w-full h-[250vh] relative z-20 bg-black">
+    <div id="welcome" ref={containerRef} className="w-full h-[350vh] relative z-20 bg-black">
       <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden">
         
         {/* Background Image Sequence */}
@@ -110,12 +174,31 @@ export default function WelcomeSequence() {
         </div>
 
         {/* Text Layer */}
-        <h2 
-          ref={textRef} 
-          className="relative z-10 text-4xl md:text-6xl lg:text-8xl font-bold uppercase tracking-widest text-white transition-opacity duration-300 drop-shadow-2xl"
-        >
-          Welcome
-        </h2>
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Top Converging Text */}
+          <div className="flex items-center justify-center mb-2 md:mb-4">
+             <h2 
+              ref={heyRef} 
+              className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-wider text-white/80 drop-shadow-2xl"
+            >
+              Hey
+            </h2>
+            <h2 
+              ref={allRef} 
+              className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-wider text-white/80 drop-shadow-2xl"
+            >
+              All
+            </h2>
+          </div>
+
+          {/* Main Welcome Text */}
+          <h2 
+            ref={textRef} 
+            className="text-4xl md:text-6xl lg:text-8xl font-bold uppercase tracking-wider text-white drop-shadow-2xl"
+          >
+            Welcome
+          </h2>
+        </div>
       </div>
     </div>
   );

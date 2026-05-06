@@ -13,13 +13,13 @@ export default function Hero() {
   const windowRef = useRef<HTMLDivElement>(null);
   const blackScreenRef = useRef<HTMLDivElement>(null);
   const myPortfolioTextRef = useRef<HTMLDivElement>(null);
-  
+
   const leftTextRef = useRef<HTMLHeadingElement>(null);
   const rightTextRef = useRef<HTMLHeadingElement>(null);
 
   useGSAP(() => {
     if (!wrapperRef.current || !windowRef.current) return;
-    
+
     const wrapper = wrapperRef.current;
 
     // ----- Initial Black Screen Fade -----
@@ -68,7 +68,19 @@ export default function Hero() {
         opacity: 1,
         duration: 0.5,
         ease: "power2.out"
-      }, 0.5); // Finishes exactly as the image reaches full size
+      }, 0.5);
+    }
+
+    // Reveal Navbar at Stage 2 (along with text)
+    const navEl = document.getElementById("main-nav");
+    if (navEl) {
+      tl.to(navEl, {
+        opacity: 1,
+        y: 0,
+        xPercent: -50,
+        duration: 0.5,
+        ease: "power2.inOut"
+      }, 0.5);
     }
 
     // As the user scrolls from 100vh to 200vh, the next section slides up and covers the sticky hero.
@@ -90,13 +102,13 @@ export default function Hero() {
         <div ref={blackScreenRef} className="absolute inset-0 bg-black z-50 pointer-events-none" />
 
         {/* The Expanding Window */}
-        <div 
-          ref={windowRef} 
+        <div
+          ref={windowRef}
           className="relative w-[280px] h-[380px] md:w-[400px] md:h-[500px] overflow-hidden z-20"
         >
           {/* Inner Container: always 100vw/100vh, centered so it matches screen coordinates */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] bg-black">
-            
+
             {/* Background Image (me1.png) */}
             <div className="absolute inset-0 w-full h-full pointer-events-none">
               <Image
@@ -111,12 +123,12 @@ export default function Hero() {
             {/* Typography layer */}
             <div className="absolute w-full h-full inset-0 pointer-events-none flex items-center justify-between px-[2%] md:px-[4%] z-20">
               <div className="overflow-hidden pr-8 pb-4 flex-shrink-0">
-                <h1 ref={leftTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-black leading-none md:leading-none lg:leading-none">
+                <h1 ref={leftTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wider text-black leading-none md:leading-none lg:leading-none">
                   <span className="inline-block translate-y-[100%] opacity-0 drop-shadow-md">BLESSON<br />JF</span>
                 </h1>
               </div>
               <div className="overflow-hidden pl-8 pb-4 text-right flex-shrink-0">
-                <h1 ref={rightTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-black leading-none md:leading-none lg:leading-none">
+                <h1 ref={rightTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wider text-black leading-none md:leading-none lg:leading-none">
                   <span className="inline-block translate-y-[100%] opacity-0 drop-shadow-md">FRONTEND<br />DEVELOPER</span>
                 </h1>
               </div>
@@ -127,7 +139,7 @@ export default function Hero() {
 
         {/* "My Portfolio" Text positioned absolutely relative to wrapper so it stays below the window initially */}
         <div ref={myPortfolioTextRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[210px] md:translate-y-[280px] z-10">
-          <p className="font-serif italic text-sm text-gray-800 tracking-wider">My Portfolio</p>
+          <p className="italic text-sm text-gray-800 tracking-wider" style={{ fontFamily: '"Instrument Serif", serif' }}>My Portfolio</p>
         </div>
 
       </section>

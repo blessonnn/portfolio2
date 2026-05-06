@@ -11,9 +11,10 @@ interface SectionRevealProps {
   children: React.ReactNode;
   title: string;
   fullWidth?: boolean;
+  id?: string;
 }
 
-export default function SectionReveal({ children, title, fullWidth = false }: SectionRevealProps) {
+export default function SectionReveal({ children, title, fullWidth = false, id }: SectionRevealProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
@@ -23,15 +24,15 @@ export default function SectionReveal({ children, title, fullWidth = false }: Se
     // Slide up and fade in the whole section
     gsap.fromTo(
       sectionRef.current,
-      { y: 80, opacity: 0 },
+      { y: 60, opacity: 0 },
       {
         y: 0,
         opacity: 1,
-        duration: 1,
+        duration: 1.2,
         ease: "power3.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 80%",
+          start: "top 75%", // Triggers slightly later for better "filling" feel
           toggleActions: "play none none reverse",
         },
       }
@@ -40,14 +41,14 @@ export default function SectionReveal({ children, title, fullWidth = false }: Se
     // Title color change effect
     gsap.fromTo(
       titleRef.current,
-      { color: "#333333" }, // dark gray
+      { color: "#1a1a1a" }, 
       {
-        color: "var(--accent)", // #3874ff
-        duration: 0.6,
+        color: "var(--accent)", 
+        duration: 0.8,
         ease: "power2.out",
         scrollTrigger: {
           trigger: titleRef.current,
-          start: "top 50%", // as it enters the center
+          start: "top 60%", 
           toggleActions: "play none none reverse",
         },
       }
@@ -55,10 +56,14 @@ export default function SectionReveal({ children, title, fullWidth = false }: Se
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className={`py-24 ${fullWidth ? 'w-full' : 'px-6 md:px-12 max-w-7xl mx-auto'}`}>
+    <section 
+      id={id}
+      ref={sectionRef} 
+      className={`py-32 ${fullWidth ? 'w-full' : 'px-6 md:px-12 max-w-7xl mx-auto'}`}
+    >
       <h2
         ref={titleRef}
-        className={`text-4xl md:text-6xl font-bold mb-12 tracking-tight transition-colors duration-300 ${fullWidth ? 'px-6 md:px-12' : ''}`}
+        className={`text-4xl md:text-6xl font-bold mb-16 tracking-tight transition-colors duration-300 ${fullWidth ? 'px-6 md:px-12' : ''}`}
       >
         {title}
       </h2>
