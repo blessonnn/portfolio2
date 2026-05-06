@@ -5,11 +5,11 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 const PROJECTS = [
-  { id: 1, title: "Cyber Protocol", category: "Web3 App" },
-  { id: 2, title: "Neon Dashboard", category: "Fintech UI" },
-  { id: 3, title: "Void Analytics", category: "Data Viz" },
-  { id: 4, title: "Pulse E-commerce", category: "Storefront" },
-  { id: 5, title: "Quantum AI", category: "Machine Learning" },
+  { id: 1, title: "Cyber Protocol", category: "Web3 App", color: "#FFC338" },
+  { id: 2, title: "Neon Dashboard", category: "Fintech UI", color: "#F4FF38" },
+  { id: 3, title: "Void Analytics", category: "Data Viz", color: "#FFFFFF" },
+  { id: 4, title: "Pulse E-commerce", category: "Storefront", color: "#0A0D14" },
+  { id: 5, title: "Quantum AI", category: "Machine Learning", color: "#FF6B6B" },
 ];
 
 export default function ProjectsAccordion() {
@@ -29,8 +29,6 @@ export default function ProjectsAccordion() {
         duration: 0.8,
         ease: "expo.out",
         filter: isActive ? "grayscale(0%)" : "grayscale(100%)",
-        borderColor: isActive ? "var(--accent)" : "transparent",
-        boxShadow: isActive ? "0 0 20px rgba(56, 116, 255, 0.4)" : "none",
       });
 
       // Animate text elements inside the card
@@ -49,16 +47,17 @@ export default function ProjectsAccordion() {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col md:flex-row w-full h-[80vh] min-h-[600px] gap-2 md:gap-4 overflow-hidden"
+      className="flex flex-col md:flex-row w-full h-[80vh] min-h-[600px] gap-0 px-2 md:px-4 overflow-hidden"
     >
       {PROJECTS.map((project) => (
         <div
           key={project.id}
-          className="project-card relative cursor-pointer border-2 border-transparent rounded-2xl overflow-hidden bg-[#111]"
+          className="project-card relative cursor-pointer overflow-hidden"
+          style={{ backgroundColor: project.color }}
           onMouseEnter={() => setActiveId(project.id)}
         >
-          {/* Background Placeholder - in a real app, use next/image here */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#222] to-black opacity-50" />
+          {/* Gradient to ensure white text is readable against light backgrounds */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none opacity-80" />
           
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
              <span className="text-6xl font-bold tracking-widest rotate-90 md:rotate-0">{project.id}</span>
