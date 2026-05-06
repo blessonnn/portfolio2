@@ -9,7 +9,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <main className="min-h-screen bg-[#0a0a0a] text-white">
 
       {/* Top gradient blur overlay — fixed, covers top ~10% of viewport */}
       <div

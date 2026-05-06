@@ -82,7 +82,7 @@ export default function WelcomeSequence() {
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top center", 
+          start: "top top", 
           end: "bottom bottom",
           scrub: true,
           onUpdate: (self) => {
@@ -132,7 +132,7 @@ export default function WelcomeSequence() {
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top center",
+          start: "top top",
           end: "bottom bottom",
           scrub: true,
         }
@@ -147,7 +147,7 @@ export default function WelcomeSequence() {
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top center",
+          start: "top top",
           end: "bottom bottom",
           scrub: true,
         }

@@ -77,7 +77,6 @@ export default function Hero() {
       tl.to(navEl, {
         opacity: 1,
         y: 0,
-        xPercent: -50,
         duration: 0.5,
         ease: "power2.inOut"
       }, 0.5);

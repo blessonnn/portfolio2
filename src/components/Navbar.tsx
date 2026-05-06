@@ -33,13 +33,13 @@ export default function Navbar() {
     const targetLeft = itemRect.left - navRect.left;
     const targetWidth = itemRect.width;
 
-    // Fluid / elastic spring animation
+    // Subtle and smooth animation
     gsap.to(pill, {
       x: targetLeft,
       width: targetWidth,
       opacity: 1,
-      duration: 0.6,
-      ease: "elastic.out(1, 0.5)",
+      duration: 0.5,
+      ease: "power3.out",
     });
   }, []);
 
@@ -132,41 +132,43 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      id="main-nav"
-      ref={navRef}
-      style={{ opacity: 0, transform: "translateX(-50%) translateY(-40px)" }}
-      className="fixed top-6 left-1/2 z-[100] flex items-center gap-1 px-2 py-1.5 bg-black/20 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl"
-    >
-      {/* Sliding blue pill indicator */}
-      <div
-        ref={pillRef}
-        className="absolute top-1.5 left-0 h-[calc(100%-12px)] rounded-full pointer-events-none z-0"
-        style={{
-          opacity: 0,
-          width: 0,
-          background: "var(--accent)",
-          filter: "blur(0.5px)",
-          boxShadow: "0 0 20px rgba(56, 116, 255, 0.4), 0 0 40px rgba(56, 116, 255, 0.15)",
-        }}
-      />
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
+      <nav
+        id="main-nav"
+        ref={navRef}
+        style={{ opacity: 0, transform: "translateY(-40px)" }}
+        className="flex items-center gap-1 px-2 py-1.5 bg-black/20 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl"
+      >
+        {/* Sliding blue pill indicator */}
+        <div
+          ref={pillRef}
+          className="absolute top-1.5 left-0 h-[calc(100%-12px)] rounded-full pointer-events-none z-0"
+          style={{
+            opacity: 0,
+            width: 0,
+            background: "var(--accent)",
+            filter: "blur(0.5px)",
+            boxShadow: "0 0 20px rgba(56, 116, 255, 0.4), 0 0 40px rgba(56, 116, 255, 0.15)",
+          }}
+        />
 
-      {NAV_ITEMS.map((item, i) => (
-        <a
-          key={item.name}
-          ref={(el) => { itemRefs.current[i] = el; }}
-          href={item.href}
-          onClick={(e) => scrollToSection(e, item.href, i)}
-          className={`relative z-10 nav-capsule px-4 py-2 text-xs md:text-sm font-medium rounded-full whitespace-nowrap transition-colors duration-300 ${
-            activeSection === item.href.replace("#", "")
-              ? "text-white"
-              : "text-white/50 hover:text-white/80"
-          }`}
-          style={{ opacity: 0 }}
-        >
-          {item.name}
-        </a>
-      ))}
-    </nav>
+        {NAV_ITEMS.map((item, i) => (
+          <a
+            key={item.name}
+            ref={(el) => { itemRefs.current[i] = el; }}
+            href={item.href}
+            onClick={(e) => scrollToSection(e, item.href, i)}
+            className={`relative z-10 nav-capsule px-4 py-2 text-xs md:text-sm font-medium rounded-full whitespace-nowrap transition-colors duration-300 ${
+              activeSection === item.href.replace("#", "")
+                ? "text-white"
+                : "text-white/50 hover:text-white/80"
+            }`}
+            style={{ opacity: 0 }}
+          >
+            {item.name}
+          </a>
+        ))}
+      </nav>
+    </div>
   );
 }
