@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import WelcomeSequence from "@/components/WelcomeSequence";
 import SectionReveal from "@/components/SectionReveal";
-import ProjectsAccordion from "@/components/ProjectsAccordion";
+import WorksStacked from "@/components/WorksStacked";
 import SkillsMarquee from "@/components/SkillsMarquee";
 import SmoothScroll from "@/components/SmoothScroll";
 import HobbiesSection from "@/components/HobbiesSection";
@@ -34,9 +34,7 @@ export default function Home() {
 
         <HobbiesSection />
 
-        <SectionReveal title="Works" id="works" fullWidth>
-          <ProjectsAccordion />
-        </SectionReveal>
+        <WorksStacked />
 
         <SectionReveal title="About Me" id="about">
           <div className="max-w-3xl">
