@@ -1,71 +1,46 @@
 "use client";
 
-import { useRef, useState } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useState, useEffect } from "react";
 
 export default function Preloader() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const circleRef = useRef<SVGCircleElement>(null);
+  const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
+  const text = "Blesson Portfolio";
 
-  useGSAP(() => {
-    if (!containerRef.current || !circleRef.current) return;
-
-    const tl = gsap.timeline({
-      onComplete: () => setIsComplete(true),
-    });
-
-    // Draw the circle
-    tl.fromTo(
-      circleRef.current,
-      { strokeDashoffset: 126 },
-      {
-        strokeDashoffset: 0,
-        duration: 1.5,
-        ease: "power2.inOut",
+  useEffect(() => {
+    let i = 0;
+    // We want the total animation to be around 2 seconds.
+    // Typing 17 characters. Let's do 60ms per character (total ~1s).
+    // Then wait 1s before disappearing.
+    const typingInterval = setInterval(() => {
+      setDisplayedText(text.substring(0, i + 1));
+      i++;
+      if (i >= text.length) {
+        clearInterval(typingInterval);
       }
-    )
-    // Add a slight pause
-    .to({}, { duration: 0.3 })
-    // Slide up the preloader screen
-    .to(containerRef.current, {
-      yPercent: -100,
-      duration: 1,
-      ease: "expo.inOut",
-    });
+    }, 60);
 
-    // Continuous rotation for the SVG
-    gsap.to(circleRef.current, {
-      rotation: 360,
-      duration: 1.5,
-      repeat: -1,
-      ease: "none",
-      transformOrigin: "50% 50%",
-    });
+    const completeTimeout = setTimeout(() => {
+      setIsComplete(true);
+    }, 2000);
 
-  }, { scope: containerRef });
+    return () => {
+      clearInterval(typingInterval);
+      clearTimeout(completeTimeout);
+    };
+  }, []);
 
   if (isComplete) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black"
-    >
-      <svg width="80" height="80" viewBox="0 0 50 50" className="overflow-visible">
-        <circle
-          ref={circleRef}
-          cx="25"
-          cy="25"
-          r="20"
-          fill="none"
-          stroke="white"
-          strokeWidth="4"
-          strokeDasharray="126"
-          strokeLinecap="round"
-        />
-      </svg>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
+      <h1 
+        className="text-white text-[25px]"
+        style={{ fontFamily: "'Martian Mono', monospace" }}
+      >
+        {displayedText}
+        <span className="animate-pulse">_</span>
+      </h1>
     </div>
   );
 }

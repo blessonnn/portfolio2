@@ -6,6 +6,7 @@ import WorksStacked from "@/components/WorksStacked";
 import SkillsMarquee from "@/components/SkillsMarquee";
 import SmoothScroll from "@/components/SmoothScroll";
 import HobbiesSection from "@/components/HobbiesSection";
+import AboutMeSection from "@/components/AboutMeSection";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
@@ -36,15 +37,7 @@ export default function Home() {
 
         <WorksStacked />
 
-        <SectionReveal title="About Me" id="about">
-          <div className="max-w-3xl">
-            <p className="text-xl md:text-2xl leading-relaxed text-gray-300">
-              I am a passionate creative developer focused on building immersive digital experiences. 
-              With a strong foundation in frontend technologies and a keen eye for design, 
-              I strive to bridge the gap between functionality and aesthetics.
-            </p>
-          </div>
-        </SectionReveal>
+        <AboutMeSection />
 
         <SectionReveal title="Contact" id="contact">
           <div className="flex flex-col gap-6">
