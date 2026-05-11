@@ -7,6 +7,7 @@ import SkillsMarquee from "@/components/SkillsMarquee";
 import SmoothScroll from "@/components/SmoothScroll";
 import HobbiesSection from "@/components/HobbiesSection";
 import AboutMeSection from "@/components/AboutMeSection";
+import ContactSection from "@/components/ContactSection";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
@@ -39,18 +40,7 @@ export default function Home() {
 
         <AboutMeSection />
 
-        <SectionReveal title="Contact" id="contact">
-          <div className="flex flex-col gap-6">
-            <p className="text-2xl md:text-4xl font-medium">Let's build something amazing together.</p>
-            <a href="mailto:hello@example.com" className="text-xl md:text-2xl text-[var(--accent)] hover:underline">
-              hello@example.com
-            </a>
-          </div>
-        </SectionReveal>
-
-        <footer className="w-full py-12 text-center text-gray-600 text-sm border-t border-white/5 mt-20">
-          <p>&copy; {new Date().getFullYear()} BLESSON JF. All rights reserved.</p>
-        </footer>
+        <ContactSection />
       </SmoothScroll>
     </main>
   );
