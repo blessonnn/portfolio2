@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,6 +16,27 @@ export default function Hero() {
 
   const leftTextRef = useRef<HTMLHeadingElement>(null);
   const rightTextRef = useRef<HTMLHeadingElement>(null);
+  const bottomTextRef = useRef<HTMLDivElement>(null);
+
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formatted = now.toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).toUpperCase();
+      setCurrentTime(formatted);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useGSAP(() => {
     if (!wrapperRef.current || !windowRef.current) return;
@@ -64,6 +85,15 @@ export default function Hero() {
     // 2. Existing text appears along with picture (0.5s to 1.0s)
     if (leftTextRef.current && rightTextRef.current) {
       tl.to([leftTextRef.current.children[0], rightTextRef.current.children[0]], {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out"
+      }, 0.5);
+    }
+
+    if (bottomTextRef.current) {
+      tl.to(bottomTextRef.current, {
         y: 0,
         opacity: 1,
         duration: 0.5,
@@ -130,6 +160,14 @@ export default function Hero() {
                 <h1 ref={rightTextRef} className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wider text-black leading-none md:leading-none lg:leading-none">
                   <span className="inline-block translate-y-[100%] opacity-0 drop-shadow-md">FRONTEND<br />DEVELOPER</span>
                 </h1>
+              </div>
+            </div>
+
+            {/* Bottom Left Info Layer */}
+            <div className="absolute bottom-4 md:bottom-8 left-[2%] md:left-[4%] z-20 pointer-events-none overflow-hidden">
+              <div ref={bottomTextRef} className="flex flex-col text-black text-xs md:text-sm font-bold uppercase tracking-wider translate-y-[100%] opacity-0">
+                <span className="leading-none m-0 p-0">KERALA</span>
+                <span className="leading-none m-0 p-0">{currentTime}</span>
               </div>
             </div>
 
