@@ -15,11 +15,12 @@ const GithubIcon = () => (
   </svg>
 );
 
-const InstagramIcon = () => (
+const DribbbleIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94" />
+    <path d="M21.75 12.83c-3.13-1.45-6-1.17-11.18 2.08-3.03 1.91-5.42 4.74-6.9 8.24" />
+    <path d="M7.6 3.5c2.4 4.5 3.6 7.6 3.5 12.4" />
   </svg>
 );
 
@@ -35,10 +36,10 @@ const BehanceIcon = () => (
 );
 
 const links = [
-  { label: "Gmail", href: "mailto:hello@example.com", icon: <Mail size={24} /> },
-  { label: "Github", href: "https://github.com", icon: <GithubIcon /> },
-  { label: "Instagram", href: "https://instagram.com", icon: <InstagramIcon /> },
-  { label: "Behance", href: "https://behance.net", icon: <BehanceIcon /> },
+  { label: "Email", href: "mailto:blezzzon@gmail.com", icon: <Mail size={24} /> },
+  { label: "Github", href: "https://github.com/blessonnn", icon: <GithubIcon /> },
+  { label: "Dribbble", href: "https://dribbble.com/blesson--j-f", icon: <DribbbleIcon /> },
+  { label: "Behance", href: "https://www.behance.net/monuyt", icon: <BehanceIcon /> },
 ];
 
 export default function ContactSection() {
@@ -66,48 +67,50 @@ export default function ContactSection() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} id="contact" className="w-full bg-[#3874FF] pt-24 pb-12 px-6 md:px-12 flex flex-col justify-between min-h-[60vh] rounded-t-[2rem]">
-      <div className="flex flex-col mb-16">
-        <h1 
-          className="text-[12vw] leading-none text-black uppercase tracking-tighter flex overflow-hidden"
-          style={{ fontFamily: "'Martian Mono', monospace" }}
-        >
-          {"Blesson".split("").map((char, index) => (
-            <span key={index} className="blesson-char inline-block">
-              {char}
-            </span>
-          ))}
-        </h1>
-        <p 
-          className="text-black text-2xl md:text-5xl font-medium mt-6 tracking-tight" 
-          style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-        >
-          let's connect
-        </p>
-      </div>
-
-      <div className="mt-auto flex flex-col gap-6 md:gap-10">
-        <hr className="border-black/30 border-t" />
-        
-        <div className="flex flex-wrap gap-8 md:gap-16 justify-start items-center w-full">
-          {links.map((link) => (
-            <a 
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center text-black font-semibold uppercase text-xl md:text-2xl tracking-wider cursor-pointer"
-            >
-              <span className="overflow-hidden flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] w-0 opacity-0 -translate-x-4 group-hover:w-10 group-hover:opacity-100 group-hover:translate-x-0">
-                {link.icon}
+    <div className="bg-white w-full">
+      <section ref={sectionRef} id="contact" className="w-full bg-[#3874FF] pt-24 pb-12 px-6 md:px-12 flex flex-col justify-between min-h-[60vh] rounded-t-[2rem]">
+        <div className="flex flex-col mb-16">
+          <h1 
+            className="text-[12vw] leading-none text-black uppercase tracking-tighter flex overflow-hidden"
+            style={{ fontFamily: "'Martian Mono', monospace" }}
+          >
+            {"Blesson".split("").map((char, index) => (
+              <span key={index} className="blesson-char inline-block">
+                {char}
               </span>
-              <span className="transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">
-                {link.label}
-              </span>
-            </a>
-          ))}
+            ))}
+          </h1>
+          <p 
+            className="text-black text-2xl md:text-5xl font-medium mt-6 tracking-tight" 
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          >
+            let's connect
+          </p>
         </div>
-      </div>
-    </section>
+
+        <div className="mt-auto flex flex-col gap-6 md:gap-10">
+          <hr className="border-black/30 border-t" />
+          
+          <div className="flex flex-wrap gap-8 md:gap-16 justify-start items-center w-full">
+            {links.map((link) => (
+              <a 
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center text-black font-semibold uppercase text-xl md:text-2xl tracking-wider cursor-pointer"
+              >
+                <span className="overflow-hidden flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] w-0 opacity-0 -translate-x-4 group-hover:w-10 group-hover:opacity-100 group-hover:translate-x-0">
+                  {link.icon}
+                </span>
+                <span className="transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">
+                  {link.label}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

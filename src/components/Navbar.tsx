@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const NAV_ITEMS = [
   { name: "Welcome", href: "#welcome" },
@@ -101,6 +104,29 @@ export default function Navbar() {
         delay: 0.1,
       }
     );
+
+    // Show/Hide on scroll
+    const showNav = gsap.fromTo(navRef.current, 
+      { y: -100, opacity: 0 }, 
+      { y: 0, opacity: 1, paused: true, duration: 0.3, ease: "power2.out" }
+    );
+
+    ScrollTrigger.create({
+      start: "top top",
+      end: "max",
+      onUpdate: (self) => {
+        // Only show after scrolling past the first section (e.g. > window height)
+        if (self.scroll() > window.innerHeight * 0.8) {
+          if (self.direction === -1) {
+            showNav.play(); // Show on scroll up
+          } else {
+            showNav.reverse(); // Hide on scroll down
+          }
+        } else {
+          showNav.reverse(); // Hidden in Hero section
+        }
+      }
+    });
   }, { scope: navRef });
 
   const scrollToSection = (
@@ -136,7 +162,7 @@ export default function Navbar() {
       <nav
         id="main-nav"
         ref={navRef}
-        style={{ opacity: 0, transform: "translateY(-40px)" }}
+        style={{ opacity: 0, transform: "translateY(-100px)" }}
         className="flex items-center gap-1 px-2 py-1.5 bg-black/20 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl"
       >
         {/* Sliding blue pill indicator */}

@@ -69,7 +69,7 @@ const WORKS = [
 const WorksStacked = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [activeTabs, setActiveTabs] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<{ id: string, tab: string } | null>(null);
 
   const handleTabClick = (workId: string, tab: string) => {
     if (tab === "code") {
@@ -77,8 +77,10 @@ const WorksStacked = () => {
       if (work?.github) window.open(work.github, "_blank");
       return;
     }
-    setActiveTabs(prev => ({ ...prev, [workId]: tab }));
+    setActiveTab({ id: workId, tab });
   };
+
+  const closeTab = () => setActiveTab(null);
 
   useGSAP(
     () => {
@@ -112,9 +114,28 @@ const WorksStacked = () => {
           }
         });
       });
+
+      // Animate the WORKS title letters
+      gsap.fromTo(".works-char", 
+        { y: 200, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 0.1, 
+          stagger: 0.1, 
+          duration: 1.2, 
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          }
+        }
+      );
     },
     { scope: containerRef }
   );
+
+  const titleColors = ["#FFC338", "#F4FF38", "#FF6B6B", "#B366FF", "#3874FF"];
 
   return (
     <section
@@ -124,98 +145,109 @@ const WorksStacked = () => {
     >
       <h2
         ref={titleRef}
-        className="text-[15vw] leading-none font-bold tracking-tighter text-white/5 z-0"
+        className="text-[15vw] leading-none font-bold tracking-tighter z-0 flex overflow-hidden absolute pointer-events-none"
       >
-        WORKS
+        {"WORKS".split("").map((char, i) => (
+          <span 
+            key={i} 
+            className="works-char inline-block"
+            style={{ color: titleColors[i] }}
+          >
+            {char}
+          </span>
+        ))}
       </h2>
 
       <div className="absolute inset-0 w-full h-full pointer-events-none">
         {WORKS.map((work, i) => {
-          const currentTab = activeTabs[work.id] || "images";
+          const isPopOverActive = activeTab?.id === work.id;
+          const currentTab = activeTab?.tab || null;
           
           return (
             <div
               key={work.id}
-              className="work-card absolute top-0 left-0 w-full h-screen shadow-[0_-20px_50px_rgba(0,0,0,0.3)] flex flex-col pointer-events-auto overflow-hidden"
+              className="work-card absolute top-0 left-0 w-full h-screen shadow-[0_-20px_50px_rgba(0,0,0,0.3)] flex flex-col pointer-events-auto overflow-hidden p-6 md:p-24"
               style={{ 
                 backgroundColor: work.color, 
                 zIndex: i + 10 
               }}
             >
-              {/* Top Section: Title & Tabs */}
-              <div className="w-full px-6 md:px-16 pt-12 md:pt-24 pb-8 border-b border-black/5">
-                <h3 className={`text-5xl md:text-8xl font-bold uppercase tracking-tighter ${work.text} mb-6 reveal-item`}>
+              {/* Main Content Area */}
+              <div className={`w-full h-full flex flex-col items-center justify-center transition-all duration-700 ${isPopOverActive ? 'blur-2xl scale-95 opacity-40' : 'blur-0 scale-100 opacity-100'}`}>
+                <h3 className={`text-7xl md:text-[10vw] font-bold uppercase tracking-tighter ${work.text} mb-4 reveal-item text-center leading-none`}>
                   {work.title}
                 </h3>
                 
-                {/* Navigation Links */}
-                <div className="flex flex-wrap gap-4 md:gap-8 reveal-item">
-                  {["code", "images", "demo", "description", "tech stack"].map((tab) => (
+                <p className={`text-lg md:text-2xl font-medium max-w-2xl text-center mb-12 reveal-item opacity-80 ${work.text}`}>
+                  {work.description}
+                </p>
+                
+                {/* Horizontal Navigation Stack */}
+                <div className="flex flex-wrap gap-8 md:gap-12 reveal-item justify-center items-center">
+                  {["code", "images", "demo", "tech stack"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTabClick(work.id, tab)}
-                      className={`text-sm md:text-lg font-bold uppercase tracking-widest transition-all duration-300 hover:opacity-100 ${
-                        currentTab === tab && tab !== "code" ? "opacity-100 border-b-2 border-current" : "opacity-40"
-                      } ${work.text}`}
+                      className={`relative text-sm md:text-lg font-bold uppercase tracking-widest group/btn py-2 ${work.text}`}
                     >
                       {tab}
+                      <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-current transform scale-x-0 transition-transform duration-500 ease-out origin-left group-hover/btn:scale-x-100`} />
                     </button>
                   ))}
                 </div>
               </div>
-              
-              {/* Content Section: Dynamic Reveal */}
-              <div className="flex-1 w-full relative overflow-hidden p-6 md:p-16 flex items-center justify-center">
-                <div 
-                  key={`${work.id}-${currentTab}`}
-                  className="w-full h-full flex flex-col items-center justify-center animate-slide-up"
-                >
-                  {currentTab === "images" && (
-                    <div className="relative w-full h-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl">
-                      <Image 
-                        src={work.image} 
-                        alt={work.title} 
-                        fill 
-                        className="object-cover"
-                        priority
-                      />
-                    </div>
-                  )}
 
-                  {currentTab === "demo" && (
-                    <div className="relative w-full h-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl bg-black">
-                      <video 
-                        src={work.demo} 
-                        autoPlay 
-                        loop 
-                        muted 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+              {/* Pop-Over Overlay */}
+              {isPopOverActive && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center p-6 md:p-20 animate-pop-up">
+                  {/* Close Button */}
+                  <button 
+                    onClick={closeTab}
+                    className="absolute top-10 right-10 md:top-16 md:right-16 w-12 h-12 bg-black text-white rounded-full flex items-center justify-center z-[60] hover:scale-110 transition-transform shadow-2xl"
+                  >
+                    <span className="text-2xl font-bold">×</span>
+                  </button>
 
-                  {currentTab === "description" && (
-                    <div className={`max-w-3xl text-center ${work.text}`}>
-                      <p className="text-xl md:text-4xl font-medium leading-tight">
-                        {work.description}
-                      </p>
-                    </div>
-                  )}
+                  <div className="w-full h-full max-w-6xl relative flex items-center justify-center">
+                    {currentTab === "images" && (
+                      <div className="relative w-full aspect-[4/3] md:h-full rounded-3xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+                        <Image 
+                          src={work.image} 
+                          alt={work.title} 
+                          fill 
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
+                    )}
 
-                  {currentTab === "tech stack" && (
-                    <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-                      {work.techStack.map((tech) => (
-                        <span 
-                          key={tech} 
-                          className={`px-6 py-3 rounded-full border border-black/10 text-lg md:text-2xl font-bold ${work.text} bg-white/10 backdrop-blur-sm`}
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                    {currentTab === "demo" && (
+                      <div className="relative w-full aspect-[4/3] md:h-full rounded-3xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)] bg-black">
+                        <video 
+                          src={work.demo} 
+                          autoPlay 
+                          loop 
+                          muted 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {currentTab === "tech stack" && (
+                      <div className="flex flex-wrap justify-center gap-4 md:gap-8 bg-black/10 backdrop-blur-md p-12 rounded-3xl border border-white/10 shadow-2xl">
+                        {work.techStack.map((tech) => (
+                          <span 
+                            key={tech} 
+                            className={`px-8 py-4 rounded-2xl border border-black/10 text-xl md:text-3xl font-black ${work.text} bg-white/20 hover:scale-105 transition-transform cursor-default`}
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })}
@@ -232,8 +264,21 @@ const WorksStacked = () => {
             opacity: 1;
           }
         }
+        @keyframes pop-up {
+          from {
+            transform: translateY(100vh);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
         .animate-slide-up {
           animation: slide-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        .animate-pop-up {
+          animation: pop-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </section>

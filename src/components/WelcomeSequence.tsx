@@ -62,6 +62,10 @@ export default function WelcomeSequence() {
   useGSAP(() => {
     if (!containerRef.current || !textRef.current || !imgRef.current || !imgContainerRef.current || !heyRef.current || !allRef.current) return;
 
+    // Center the text initially
+    gsap.set([heyRef.current, allRef.current], { x: 0, opacity: 1 });
+    gsap.set([heyRef.current, allRef.current, textRef.current], { transformPerspective: 1000 });
+
     // Background Image Animation
     gsap.fromTo(imgContainerRef.current,
       {
@@ -94,22 +98,33 @@ export default function WelcomeSequence() {
               languages.length - 1
             );
             
-            // Map progress to image frame (1 to 28)
+            // Map progress to image frame (1 to FRAME_COUNT)
             const frameIndex = Math.min(
               Math.floor(progress * FRAME_COUNT) + 1,
               FRAME_COUNT
             );
             
+            // Handle Language Change with Flip Animation
+            const targets = [textRef.current, heyRef.current, allRef.current];
+            
             if (textRef.current && textRef.current.innerText !== languages[textIndex]) {
-              textRef.current.innerText = languages[textIndex];
-            }
-
-            if (heyRef.current && heyRef.current.innerText !== heyLanguages[textIndex]) {
-              heyRef.current.innerText = heyLanguages[textIndex];
-            }
-
-            if (allRef.current && allRef.current.innerText !== allLanguages[textIndex]) {
-              allRef.current.innerText = allLanguages[textIndex];
+              // Trigger a quick flip animation when the text content changes
+              gsap.to(targets, {
+                rotateX: -90,
+                opacity: 0,
+                duration: 0.15,
+                ease: "power2.in",
+                onComplete: () => {
+                  if (textRef.current) textRef.current.innerText = languages[textIndex];
+                  if (heyRef.current) heyRef.current.innerText = heyLanguages[textIndex];
+                  if (allRef.current) allRef.current.innerText = allLanguages[textIndex];
+                  
+                  gsap.fromTo(targets, 
+                    { rotateX: 90, opacity: 0 },
+                    { rotateX: 0, opacity: 1, duration: 0.15, ease: "power2.out" }
+                  );
+                }
+              });
             }
 
             if (imgRef.current) {
@@ -120,36 +135,6 @@ export default function WelcomeSequence() {
               }
             }
           }
-        }
-      }
-    );
-
-    // "Hey" Text Animation (Sliding from left)
-    gsap.fromTo(heyRef.current,
-      { x: "-38vw", opacity: 1 },
-      { 
-        x: "-1.5rem", 
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
-        }
-      }
-    );
-
-    // "All" Text Animation (Sliding from right)
-    gsap.fromTo(allRef.current,
-      { x: "38vw", opacity: 1 },
-      { 
-        x: "1.5rem", 
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
         }
       }
     );
@@ -176,7 +161,7 @@ export default function WelcomeSequence() {
         {/* Text Layer */}
         <div className="relative z-10 flex flex-col items-center">
           {/* Top Converging Text */}
-          <div className="flex items-center justify-center mb-2 md:mb-4">
+          <div className="flex items-center justify-center gap-6 mb-2 md:mb-4">
              <h2 
               ref={heyRef} 
               className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-wider text-white/80 drop-shadow-2xl"
