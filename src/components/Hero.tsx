@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,11 +13,13 @@ export default function Hero() {
   const windowRef = useRef<HTMLDivElement>(null);
   const blackScreenRef = useRef<HTMLDivElement>(null);
   const myPortfolioTextRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const leftTextRef = useRef<HTMLHeadingElement>(null);
   const rightTextRef = useRef<HTMLHeadingElement>(null);
   const bottomTextRef = useRef<HTMLDivElement>(null);
 
+  const maskState = useRef({ scale: 80, opacity: 0 });
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
@@ -38,12 +40,69 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  // ---- Canvas mask drawing ----
+  const drawMask = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.width;
+    const h = canvas.height;
+    const { scale, opacity } = maskState.current;
+
+    ctx.clearRect(0, 0, w, h);
+    if (opacity <= 0.001) return;
+
+    // Blue fill
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = "#3874FF";
+    ctx.fillRect(0, 0, w, h);
+
+    // Punch out text (transparent holes → Hero shows through)
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "black";
+
+    const baseFontSize = (w / dpr) * 0.1;
+    const fontSize = baseFontSize * scale;
+    ctx.font = `900 ${fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText("WELCOME", w / 2, h / 2 - fontSize * 0.08);
+    ctx.fillText("ALL", w / 2, h / 2 + fontSize * 0.85);
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+  }, []);
+
+  // Canvas resize handler
+  useEffect(() => {
+    const resize = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      drawMask();
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [drawMask]);
+
+  // ---- Main scroll timeline ----
   useGSAP(() => {
     if (!wrapperRef.current || !windowRef.current) return;
 
     const wrapper = wrapperRef.current;
 
-    // ----- Initial Black Screen Fade -----
+    // Initial Black Screen Fade
     gsap.to(blackScreenRef.current, {
       opacity: 0,
       duration: 0.5,
@@ -54,19 +113,67 @@ export default function Hero() {
       }
     });
 
-    // ----- ScrollTrigger Expansion and Text Animation -----
+    // ---- Three-phase pinned timeline ----
+    // Total duration = 5.0 units → mapped to +=500% (500vh of scroll)
+    //
+    // PHASE 1 — Hero Reveal (0→2.0)
+    //   0→1.0:  Window expands, "My Portfolio" fades
+    //   0.5→1.0: Text + navbar appear
+    //   1.0→2.0: Text moves inward, hero fully revealed & stable
+    //
+    // PHASE 2 — Mask Zoom (2.0→4.0)
+    //   2.0→2.5: Blue mask morphs in (opacity 0→1), text at scale 80
+    //   2.5→4.0: Text zooms from scale 80→1 (blue "lands" on hero)
+    //
+    // PHASE 3 — Exit (4.0→5.0)
+    //   4.0→4.5: Hold at final state
+    //   4.5→5.0: Mask fades out, section unpins, scrolls to next
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapper,
         start: "top top",
-        end: "+=500%", // Pin extended to cover mask animation
+        end: "+=500%",
         pin: true,
-        pinSpacing: false, // Prevents GSAP from adding padding so the manual spacer works
+        pinSpacing: false,
         scrub: 1,
+        onUpdate: (self) => {
+          const p = self.progress; // 0→1 over 500vh
+          const t = p * 5.0; // map to 0→5.0 timeline units
+
+          // ---- PHASE 2 & 3: Canvas mask ----
+          if (t < 2.0) {
+            // Phase 1: No mask
+            maskState.current.opacity = 0;
+            maskState.current.scale = 80;
+          } else if (t < 2.5) {
+            // Mask morphs in (opacity 0→1)
+            maskState.current.opacity = (t - 2.0) / 0.5;
+            maskState.current.scale = 80;
+          } else if (t < 4.0) {
+            // Text zooms from 80→1
+            maskState.current.opacity = 1;
+            const zp = (t - 2.5) / 1.5;
+            const eased = gsap.parseEase("power2.out")(zp);
+            maskState.current.scale = gsap.utils.interpolate(80, 1, eased);
+          } else if (t < 4.5) {
+            // Hold
+            maskState.current.opacity = 1;
+            maskState.current.scale = 1;
+          } else {
+            // Mask fades out
+            maskState.current.opacity = 1 - (t - 4.5) / 0.5;
+            maskState.current.scale = 1;
+          }
+
+          drawMask();
+        }
       }
     });
 
-    // 1. Expand the window (0 to 1.0s) -> 0 to 100vh of scroll
+    // ---- PHASE 1 animations (on the GSAP timeline) ----
+
+    // 1. Expand the window (0→1.0)
     tl.to(windowRef.current, {
       width: "100%",
       height: "100%",
@@ -82,7 +189,7 @@ export default function Hero() {
       ease: "power2.in"
     }, 0);
 
-    // 2. Existing text appears along with picture (0.5s to 1.0s)
+    // 2. Text appears (0.5→1.0)
     if (leftTextRef.current && rightTextRef.current) {
       tl.to([leftTextRef.current.children[0], rightTextRef.current.children[0]], {
         y: 0,
@@ -101,22 +208,19 @@ export default function Hero() {
       }, 0.5);
     }
 
-    // Reveal Navbar at Stage 2 (along with text)
-    const navEl = document.getElementById("main-nav");
-    if (navEl) {
-      tl.to(navEl, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.inOut"
-      }, 0.5);
-    }
-
-    // As the user scrolls from 100vh to 200vh, the next section slides up and covers the sticky hero.
-    // Exactly during this phase (1.0s to 2.0s), the text moves towards the center.
+    // 3. Text moves inward (1.0→2.0)
     if (leftTextRef.current && rightTextRef.current) {
       tl.to(leftTextRef.current, { x: "15vw", ease: "none", duration: 1.0 }, 1.0)
         .to(rightTextRef.current, { x: "-15vw", ease: "none", duration: 1.0 }, 1.0);
+    }
+
+    // 4. Fade hero text out during mask entrance (2.0→2.5)
+    if (leftTextRef.current && rightTextRef.current && bottomTextRef.current) {
+      tl.to([leftTextRef.current, rightTextRef.current, bottomTextRef.current], {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in"
+      }, 2.0);
     }
 
   }, { scope: wrapperRef });
@@ -125,6 +229,7 @@ export default function Hero() {
     <>
       <section
         ref={wrapperRef}
+        id="welcome"
         className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[#f5f5f5] z-0"
       >
         {/* Initial Black Screen */}
@@ -135,10 +240,10 @@ export default function Hero() {
           ref={windowRef}
           className="relative w-[280px] h-[380px] md:w-[400px] md:h-[500px] overflow-hidden z-20"
         >
-          {/* Inner Container: always 100vw/100vh, centered so it matches screen coordinates */}
+          {/* Inner Container: always 100vw/100vh, centered */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vh] bg-black">
 
-            {/* Background Image (me1.png) */}
+            {/* Background Image */}
             <div className="absolute inset-0 w-full h-full pointer-events-none">
               <Image
                 src="/images/hero/me1.png"
@@ -174,14 +279,21 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* "My Portfolio" Text positioned absolutely relative to wrapper so it stays below the window initially */}
+        {/* "My Portfolio" Text */}
         <div ref={myPortfolioTextRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[210px] md:translate-y-[280px] z-10">
           <p className="italic text-sm text-gray-800 tracking-wider" style={{ fontFamily: '"Instrument Serif", serif' }}>My Portfolio</p>
         </div>
 
+        {/* Canvas Mask — always rendered inside the pinned Hero, above everything */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 z-40 pointer-events-none"
+          style={{ willChange: "transform" }}
+        />
+
       </section>
 
-      {/* Manual Spacer: delays the next section from sliding over the Hero by 100vh */}
+      {/* Spacer for pin duration */}
       <div className="w-full h-[400vh] pointer-events-none bg-transparent" />
     </>
   );
