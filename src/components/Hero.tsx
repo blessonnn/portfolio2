@@ -59,7 +59,7 @@ export default function Hero() {
       scrollTrigger: {
         trigger: wrapper,
         start: "top top",
-        end: "+=200%", // Pin for exactly 200vh of scroll
+        end: "+=500%", // Pin extended to cover mask animation
         pin: true,
         pinSpacing: false, // Prevents GSAP from adding padding so the manual spacer works
         scrub: 1,
@@ -182,7 +182,7 @@ export default function Hero() {
       </section>
 
       {/* Manual Spacer: delays the next section from sliding over the Hero by 100vh */}
-      <div className="w-full h-[100vh] pointer-events-none bg-transparent" />
+      <div className="w-full h-[400vh] pointer-events-none bg-transparent" />
     </>
   );
 }
