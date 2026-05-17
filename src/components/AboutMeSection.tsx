@@ -75,8 +75,8 @@ export default function AboutMeSection() {
       ease: "none",
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: "top center",
-        end: "bottom center",
+        start: "top bottom",
+        end: "top top",
         scrub: true,
       }
     });

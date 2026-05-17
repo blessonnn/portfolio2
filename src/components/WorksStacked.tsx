@@ -332,11 +332,7 @@ const WorksStacked = () => {
                   {/* Close Button */}
                   <button 
                     onClick={closeTab}
-                    className={`absolute top-8 right-8 md:top-12 md:right-12 w-12 h-12 rounded-full flex items-center justify-center z-[60] hover:scale-110 transition-all shadow-lg backdrop-blur-md border ${
-                      work.id === 'lastpage' && currentTab === 'tech stack'
-                        ? 'text-black/80 bg-black/10 border-black/20 hover:bg-black/20'
-                        : 'text-white/80 bg-white/10 border-white/20 hover:bg-white/20'
-                    }`}
+                    className="absolute top-8 right-8 md:top-12 md:right-12 w-12 h-12 rounded-full flex items-center justify-center z-[60] hover:scale-110 transition-all shadow-lg border border-white/30 text-white bg-transparent mix-blend-difference hover:bg-white/10"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
