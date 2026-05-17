@@ -18,25 +18,25 @@ const HOBBIES = [
     id: "graphic-designing",
     title: "Graphic Designing",
     color: "#F4FF38",
-    images: Array.from({ length: 6 }, (_, i) => `/images/graphic-designing/${i + 1}.jpg`),
+    images: Array.from({ length: 21 }, (_, i) => `/images/graphic-designing/${i + 1}.jpg`),
   },
   {
     id: "drawing",
     title: "Drawing",
     color: "#FF6B6B",
-    images: Array.from({ length: 6 }, (_, i) => `/images/drawing/${i + 1}.jpg`),
+    images: Array.from({ length: 1 }, (_, i) => `/images/drawing/${i + 1}.jpg`),
   },
   {
     id: "sound-designing",
     title: "Sound Designing",
     color: "#4D9FFF",
-    images: Array.from({ length: 6 }, (_, i) => `/images/sound-designing/${i + 1}.jpg`),
+    images: Array.from({ length: 1 }, (_, i) => `/images/sound-designing/${i + 1}.jpg`),
   },
   {
     id: "musical-instruments",
     title: "Musical Instruments",
     color: "#B366FF",
-    images: Array.from({ length: 6 }, (_, i) => `/images/musical-instruments/${i + 1}.jpg`),
+    images: Array.from({ length: 1 }, (_, i) => `/images/musical-instruments/${i + 1}.jpg`),
   },
 ];
 
@@ -133,24 +133,31 @@ const HobbiesSection = () => {
 
   useGSAP(() => {
     if (activeHobby) {
-      const items = document.querySelectorAll(".hobby-image-item");
-      items.forEach((item) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
+      // Set initial state for batching
+      gsap.set(".hobby-image-item img", { scale: 0.9, transformOrigin: "center center" });
+
+      ScrollTrigger.batch(".hobby-image-item", {
+        scroller: "#hobby-scroll-container",
+        start: "top bottom-=40",
+        onEnter: (batch) => {
+          const imgs = batch.map(el => el.querySelector("img")).filter(Boolean);
+          gsap.to(imgs, {
+            scale: 1,
+            duration: 1.2,
+            stagger: 0.08,
             ease: "power3.out",
-            scrollTrigger: {
-              trigger: item,
-              scroller: "#hobby-scroll-container",
-              start: "top bottom-=50",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
+            overwrite: true
+          });
+        },
+        onLeaveBack: (batch) => {
+          const imgs = batch.map(el => el.querySelector("img")).filter(Boolean);
+          gsap.to(imgs, {
+            scale: 0.9,
+            duration: 0.4,
+            ease: "power2.in",
+            overwrite: true
+          });
+        }
       });
     }
   }, { dependencies: [activeHobby] });
@@ -205,15 +212,19 @@ const HobbiesSection = () => {
           /* Grid View (Fixed Overlay) */
           <div 
             id="hobby-scroll-container"
-            className="fixed inset-0 z-[200] bg-white text-black flex flex-col h-screen overflow-y-auto no-scrollbar animate-in fade-in duration-300"
+            className="fixed inset-0 z-[200] text-black flex flex-col h-screen overflow-y-auto no-scrollbar animate-in fade-in duration-300 transition-colors"
+            style={{ backgroundColor: HOBBIES.find((h) => h.id === activeHobby)?.color || "#ffffff" }}
             data-lenis-prevent="true"
           >
             <div className="max-w-7xl mx-auto w-full px-4 md:px-12 pt-8 pb-20">
               {/* Header / Back Button */}
-              <div className="flex items-center justify-between mb-8 sticky top-0 bg-white z-20 py-4">
+              <div 
+                className="flex items-center justify-between mb-8 sticky top-0 z-[999] py-4 transition-colors"
+                style={{ backgroundColor: HOBBIES.find((h) => h.id === activeHobby)?.color || "#ffffff" }}
+              >
                 <button
-                  onClick={() => setActiveHobby(null)}
-                  className="text-xl md:text-2xl font-medium hover:text-gray-500 transition-colors flex items-center gap-2"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveHobby(null); }}
+                  className="relative z-[1000] px-6 py-2 bg-black text-white text-xl md:text-2xl font-medium rounded-full hover:bg-black/80 transition-colors flex items-center gap-2 cursor-pointer pointer-events-auto shadow-2xl"
                 >
                   &larr; Back
                 </button>
@@ -223,7 +234,7 @@ const HobbiesSection = () => {
               </div>
 
               {/* Grid Container */}
-              <div className="group grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 w-full bg-white">
+              <div className="group grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 w-full">
                 {HOBBIES.find((h) => h.id === activeHobby)?.images.map((src, i) => (
                   <a
                     href={src}

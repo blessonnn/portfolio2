@@ -15,7 +15,7 @@ const WORKS = [
     color: "#FFC338", 
     text: "text-black",
     github: "https://github.com/blessonnn/Health_IoT_Project",
-    description: "A real-time Health IoT dashboard monitoring system. It processes vital health metrics from sensors and uses ML to predict potential health risks.",
+    description: "VitalPulse is an AI-powered healthcare diagnostic platform that blends real-time IoT hardware metrics with user-reported data. The system reads immediate physical vitals (like heart rate, temperature, and SpO2) alongside clinical symptoms to predict potential diseases and instantly provide preliminary health suggestions.\n\nFeaturing an Apple-inspired minimalist interface, it uses smart heuristics to dynamically prioritize relevant symptoms based on current vital signs and includes a natural language processing layer that automatically extracts medical data from plain-English descriptions. Under the hood, a decoupled Flask backend runs a high-accuracy Random Forest classification model to deliver lightning-fast, data-driven diagnostic insights.",
     techStack: ["Next.js", "Flask", "Python", "MQTT", "Machine Learning"],
     image: "/images/projects/vitalpulse.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4" // Placeholder video
@@ -55,7 +55,7 @@ const WORKS = [
   },
   { 
     id: "valentine", 
-    title: "Valentine", 
+    title: "Portfolio", 
     color: "#B366FF", 
     text: "text-white",
     github: "https://github.com/blessonnn/valentine",
@@ -65,6 +65,37 @@ const WORKS = [
     demo: "https://www.w3schools.com/html/mov_bbb.mp4"
   },
 ];
+
+const BlockRevealText = ({ text }: { text: string }) => {
+  return (
+    <>
+      {text.split('\n').map((line, lineIndex) => (
+        <React.Fragment key={lineIndex}>
+          {line.split(' ').map((word, wordIndex) => (
+            <span key={`${lineIndex}-${wordIndex}`} className="word-container relative inline-block overflow-hidden mx-[0.1em] align-bottom">
+              <span className="opacity-0 reveal-word inline-block">{word}</span>
+              <span className="absolute top-0 left-0 w-full h-full bg-black reveal-block origin-left transform scale-x-0 z-10"></span>
+            </span>
+          ))}
+          {lineIndex < text.split('\n').length - 1 && <br />}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+const BlockRevealParagraph = ({ text }: { text: string }) => {
+  return (
+    <>
+      {text.split('\n\n').map((paragraph, index) => (
+        <span key={index} className="word-container relative block overflow-hidden mb-4 last:mb-0 w-full">
+          <span className="opacity-0 reveal-word block text-justify whitespace-pre-wrap">{paragraph}</span>
+          <span className="absolute top-0 left-0 w-full h-full bg-black reveal-block origin-left transform scale-x-0 z-10"></span>
+        </span>
+      ))}
+    </>
+  );
+};
 
 const WorksStacked = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -100,17 +131,51 @@ const WorksStacked = () => {
         // Initial state
         gsap.set(card, { yPercent: 100 });
 
+        let animationTriggered = false;
+
         // Slide up animation
         tl.to(card, {
           yPercent: 0,
           ease: "none",
-          onStart: () => {
-            // Animate items inside when card starts appearing
-            const items = card.querySelectorAll(".reveal-item");
-            gsap.fromTo(items, 
-              { y: 50, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out", overwrite: "auto" }
-            );
+          onUpdate: function () {
+            if (this.progress() >= 0.5 && !animationTriggered) {
+              animationTriggered = true;
+              
+              // Animate word-by-word block reveal
+              const wordContainers = card.querySelectorAll(".word-container");
+              if (wordContainers.length > 0) {
+                const revealTl = gsap.timeline({ overwrite: "auto" });
+                wordContainers.forEach((container, i) => {
+                  const block = container.querySelector(".reveal-block");
+                  const word = container.querySelector(".reveal-word");
+                  const delay = i * 0.03; // stagger fast
+                  
+                  revealTl.to(block, { scaleX: 1, duration: 0.25, ease: "power2.inOut" }, delay);
+                  revealTl.set(word, { opacity: 1 }, delay + 0.125);
+                  revealTl.set(block, { transformOrigin: "right" }, delay + 0.25);
+                  revealTl.to(block, { scaleX: 0, duration: 0.25, ease: "power2.inOut" }, delay + 0.25);
+                });
+              }
+
+              // Animate other standard reveal-items (like buttons)
+              const standardItems = card.querySelectorAll(".reveal-item");
+              if (standardItems.length > 0) {
+                gsap.fromTo(standardItems, 
+                  { y: 50, opacity: 0 },
+                  { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out", overwrite: "auto" }
+                );
+              }
+            } else if (this.progress() < 0.1 && animationTriggered) {
+              // Reset the animation if scrolled back down
+              animationTriggered = false;
+              const words = card.querySelectorAll(".reveal-word");
+              const blocks = card.querySelectorAll(".reveal-block");
+              gsap.set(words, { opacity: 0 });
+              gsap.set(blocks, { scaleX: 0, transformOrigin: "left" });
+              
+              const standardItems = card.querySelectorAll(".reveal-item");
+              gsap.set(standardItems, { opacity: 0, y: 50 });
+            }
           }
         });
       });
@@ -120,7 +185,7 @@ const WorksStacked = () => {
         { y: 200, opacity: 0 },
         { 
           y: 0, 
-          opacity: 0.1, 
+          opacity: 1, 
           stagger: 0.1, 
           duration: 1.2, 
           ease: "power4.out",
@@ -134,8 +199,6 @@ const WorksStacked = () => {
     },
     { scope: containerRef }
   );
-
-  const titleColors = ["#FFC338", "#F4FF38", "#FF6B6B", "#B366FF", "#3874FF"];
 
   return (
     <section
@@ -151,7 +214,6 @@ const WorksStacked = () => {
           <span 
             key={i} 
             className="works-char inline-block"
-            style={{ color: titleColors[i] }}
           >
             {char}
           </span>
@@ -174,24 +236,33 @@ const WorksStacked = () => {
             >
               {/* Main Content Area */}
               <div className={`w-full h-full flex flex-col items-center justify-center transition-all duration-700 ${isPopOverActive ? 'blur-2xl scale-95 opacity-40' : 'blur-0 scale-100 opacity-100'}`}>
-                <h3 className={`text-7xl md:text-[10vw] font-bold uppercase tracking-tighter ${work.text} mb-4 reveal-item text-center leading-none`}>
-                  {work.title}
+                <h3 className={`text-7xl md:text-[10vw] font-bold uppercase tracking-tighter ${work.text} mb-4 text-center leading-none`}>
+                  <BlockRevealText text={work.title} />
                 </h3>
                 
-                <p className={`text-lg md:text-2xl font-medium max-w-2xl text-center mb-12 reveal-item opacity-80 ${work.text}`}>
-                  {work.description}
+                <p className={`text-sm md:text-base font-medium font-['Helvetica',_sans-serif] text-justify max-w-4xl mb-12 opacity-80 ${work.text}`}>
+                  <BlockRevealParagraph text={work.description} />
                 </p>
                 
                 {/* Horizontal Navigation Stack */}
-                <div className="flex flex-wrap gap-8 md:gap-12 reveal-item justify-center items-center">
+                <div className="flex flex-wrap gap-4 md:gap-6 reveal-item justify-center items-center">
                   {["code", "images", "demo", "tech stack"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTabClick(work.id, tab)}
-                      className={`relative text-sm md:text-lg font-bold uppercase tracking-widest group/btn py-2 ${work.text}`}
+                      className={`text-sm md:text-base font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-colors duration-300 shadow-sm hover:shadow-lg ${
+                        work.id === 'vitalpulse'
+                          ? 'bg-black text-white hover:bg-[#FFE7A3] hover:text-black'
+                          : work.id === 'pixelvault'
+                          ? 'bg-black text-white hover:bg-[#F2FF84] hover:text-black'
+                          : work.id === 'trackie'
+                          ? 'bg-white text-black hover:bg-[#FF9E9E] hover:text-black'
+                          : work.id === 'valentine'
+                          ? 'bg-white text-black hover:bg-[#E0B0FF] hover:text-black'
+                          : 'bg-white text-black hover:bg-black hover:text-white'
+                      }`}
                     >
                       {tab}
-                      <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-current transform scale-x-0 transition-transform duration-500 ease-out origin-left group-hover/btn:scale-x-100`} />
                     </button>
                   ))}
                 </div>
