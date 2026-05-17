@@ -16,7 +16,19 @@ const WORKS = [
     text: "text-black",
     github: "https://github.com/blessonnn/Health_IoT_Project",
     description: "VitalPulse is an AI-powered healthcare diagnostic platform that blends real-time IoT hardware metrics with user-reported data. The system reads immediate physical vitals (like heart rate, temperature, and SpO2) alongside clinical symptoms to predict potential diseases and instantly provide preliminary health suggestions.\n\nFeaturing an Apple-inspired minimalist interface, it uses smart heuristics to dynamically prioritize relevant symptoms based on current vital signs and includes a natural language processing layer that automatically extracts medical data from plain-English descriptions. Under the hood, a decoupled Flask backend runs a high-accuracy Random Forest classification model to deliver lightning-fast, data-driven diagnostic insights.",
-    techStack: ["Next.js", "Flask", "Python", "MQTT", "Machine Learning"],
+    techStack: [
+      "Minimalist Glassmorphism",
+      "Inter Typography",
+      "Streamlit",
+      "Streamlit-Lottie",
+      "Requests",
+      "Flask",
+      "Python 3",
+      "RESTful API (JSON)",
+      "Scikit-Learn",
+      "Pandas",
+      "Joblib"
+    ],
     image: "/images/projects/vitalpulse.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4" // Placeholder video
   },
@@ -26,8 +38,17 @@ const WORKS = [
     color: "#F4FF38", 
     text: "text-black",
     github: "https://github.com/blessonnn/pixelvault",
-    description: "A decentralized gallery for digital art and assets, focusing on high-performance rendering and secure asset management.",
-    techStack: ["React", "Three.js", "Web3.js", "Solidity", "TailwindCSS"],
+    description: "PixelVault is an advanced web application dedicated to secure image steganography, providing an intuitive and visually elegant platform for concealing sensitive data within digital media. By embedding encrypted information directly into the least significant bits (LSB) of image files, PixelVault allows users to achieve covert, completely undetectable communication.\n\nThe application prioritizes data security and structural integrity, ensuring that the visual quality of the carrier image remains visually indistinguishable from the original, even after data encoding. Built with a highly responsive, modern frontend, it streamlines the complex process of encoding and decoding secret layers within digital images.",
+    techStack: [
+      "HTML5",
+      "CSS3 (Grid & Flexbox Layouts)",
+      "Vanilla JavaScript",
+      "Python 3",
+      "Pillow (PIL)",
+      "NumPy",
+      "Flask",
+      "Git / GitHub Pages"
+    ],
     image: "/images/projects/pixelvault.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4"
   },
@@ -100,15 +121,22 @@ const BlockRevealParagraph = ({ text }: { text: string }) => {
 const WorksStacked = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [activeTab, setActiveTab] = useState<{ id: string, tab: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<{ id: string, tab: string, x?: number, y?: number } | null>(null);
 
-  const handleTabClick = (workId: string, tab: string) => {
+  const handleTabClick = (workId: string, tab: string, e?: React.MouseEvent) => {
     if (tab === "code") {
       const work = WORKS.find(w => w.id === workId);
       if (work?.github) window.open(work.github, "_blank");
       return;
     }
-    setActiveTab({ id: workId, tab });
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    if (e) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    setActiveTab({ id: workId, tab, x, y });
   };
 
   const closeTab = () => setActiveTab(null);
@@ -249,7 +277,7 @@ const WorksStacked = () => {
                   {["code", "images", "demo", "tech stack"].map((tab) => (
                     <button
                       key={tab}
-                      onClick={() => handleTabClick(work.id, tab)}
+                      onClick={(e) => handleTabClick(work.id, tab, e)}
                       className={`text-sm md:text-base font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-colors duration-300 shadow-sm hover:shadow-lg ${
                         work.id === 'vitalpulse'
                           ? 'bg-black text-white hover:bg-[#FFE7A3] hover:text-black'
@@ -270,13 +298,19 @@ const WorksStacked = () => {
 
               {/* Pop-Over Overlay */}
               {isPopOverActive && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center p-6 md:p-20 animate-pop-up">
+                <div 
+                  className="absolute inset-0 z-50 flex items-center justify-center p-6 md:p-20 animate-expand-out"
+                  style={activeTab?.x !== undefined ? { transformOrigin: `${activeTab.x}px ${activeTab.y}px` } : undefined}
+                >
                   {/* Close Button */}
                   <button 
                     onClick={closeTab}
-                    className="absolute top-10 right-10 md:top-16 md:right-16 w-12 h-12 bg-black text-white rounded-full flex items-center justify-center z-[60] hover:scale-110 transition-transform shadow-2xl"
+                    className="absolute top-8 right-8 md:top-12 md:right-12 w-12 h-12 text-white/80 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center z-[60] hover:scale-110 hover:bg-white/20 transition-all shadow-lg"
                   >
-                    <span className="text-2xl font-bold">×</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
 
                   <div className="w-full h-full max-w-6xl relative flex items-center justify-center">
@@ -305,11 +339,11 @@ const WorksStacked = () => {
                     )}
 
                     {currentTab === "tech stack" && (
-                      <div className="flex flex-wrap justify-center gap-4 md:gap-8 bg-black/10 backdrop-blur-md p-12 rounded-3xl border border-white/10 shadow-2xl">
+                      <div className="flex flex-wrap justify-center gap-3 md:gap-6 bg-black/10 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl">
                         {work.techStack.map((tech) => (
                           <span 
                             key={tech} 
-                            className={`px-8 py-4 rounded-2xl border border-black/10 text-xl md:text-3xl font-black ${work.text} bg-white/20 hover:scale-105 transition-transform cursor-default`}
+                            className={`px-4 py-2 md:px-6 md:py-3 rounded-xl border border-black/10 text-sm md:text-lg font-bold ${work.text} bg-white/20 hover:scale-105 transition-transform cursor-default`}
                           >
                             {tech}
                           </span>
@@ -335,21 +369,21 @@ const WorksStacked = () => {
             opacity: 1;
           }
         }
-        @keyframes pop-up {
+        @keyframes expand-out {
           from {
-            transform: translateY(100vh);
+            transform: scale(0);
             opacity: 0;
           }
           to {
-            transform: translateY(0);
+            transform: scale(1);
             opacity: 1;
           }
         }
         .animate-slide-up {
           animation: slide-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
-        .animate-pop-up {
-          animation: pop-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .animate-expand-out {
+          animation: expand-out 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </section>
