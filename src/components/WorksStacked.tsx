@@ -58,8 +58,16 @@ const WORKS = [
     color: "#FFFFFF", 
     text: "text-black",
     github: "https://github.com/blessonnn/lastpage",
-    description: "An AI-powered reading assistant that summarizes long articles and organizes your digital library with semantic search.",
-    techStack: ["Next.js", "OpenAI API", "Pinecone", "LangChain"],
+    description: "Lastpage is a highly interactive, responsive digital yearbook application custom-built for graduating classes to celebrate, connect, and preserve memories. Designed with a premium, modern glassmorphism aesthetic and fluid motion graphics, the platform serves as a collaborative space where students can create personalized profile cards, upload media assets, and exchange digital signatures and farewell messages.\n\nThe application utilizes a sophisticated client-side state machine to handle seamless view transitions and incorporates a robust, role-based access control flow. This infrastructure powers both the secure student portal—where users manage their media and dynamic message boards—and a dedicated administrative dashboard built for real-time content moderation and platform management.",
+    techStack: [
+      "React",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Glassmorphism UI Components",
+      "Firebase (Hosting)",
+      "Firebase Realtime Database / Firestore",
+      "Firebase Authentication (Role-Based Access)"
+    ],
     image: "/images/projects/lastpage.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4"
   },
@@ -69,8 +77,17 @@ const WORKS = [
     color: "#FF6B6B", 
     text: "text-white",
     github: "https://github.com/blessonnn/trackie",
-    description: "Personal finance and habit tracker with gamified features to help users maintain their goals and financial health.",
-    techStack: ["React Native", "Firebase", "D3.js", "Redux Toolkit"],
+    description: "The College Bus Tracking System is a real-time full-stack transit monitoring platform engineered to streamline campus fleet coordination and improve commuter safety. The system architecture integrates live geospatial visualization via the OpenStreetMap API to map and monitor precise fleet coordinates continuously.\n\nBuilt with a structured MySQL database layer to manage complex entities like interconnected routes, dynamic schedules, and driver assignments, the platform ensures data consistency across the network. It features a custom backend logic engine that implements strict, role-based access control tiers tailored specifically for administrative oversight, driver updates, and student accessibility.",
+    techStack: [
+      "Responsive Web Interface",
+      "OpenStreetMap API / Leaflet.js",
+      "Geospatial Live UI Components",
+      "Python 3",
+      "Custom Routing & Geofencing Logic",
+      "MySQL",
+      "Relational Database Schema (Routes, Vehicles, Accounts)",
+      "Role-Based Access Control (RBES)"
+    ],
     image: "/images/projects/trackie.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4"
   },
@@ -80,8 +97,18 @@ const WORKS = [
     color: "#B366FF", 
     text: "text-white",
     github: "https://github.com/blessonnn/valentine",
-    description: "An interactive storytelling platform where users can create and share branched narratives with immersive audio-visuals.",
-    techStack: ["Vue.js", "Howler.js", "GSAP", "Firebase"],
+    description: "Portfolio v2 is a high-end, premium digital showroom designed with a minimalist, monochromatic visual identity to highlight a strong focus on creative UI/UX direction and motion graphics. Rejecting generic templates, the platform features a custom-engineered architecture that balances Apple-inspired spatial aesthetics with bleeding-edge web performance.\n\nThe user experience is anchored by ultra-fluid interactive elements, including kinetic hero section image reveals, smart magnetic hover states, and dynamic project layout components. Leveraging GSAP and Lenis smooth scrolling to establish high-fidelity, scroll-driven visual storytelling, the portfolio flawlessly bridges technical engineering with exceptional digital craftsmanship.",
+    techStack: [
+      "Next.js (App Router / React)",
+      "TypeScript",
+      "Tailwind CSS",
+      "High-contrast Monochromatic System",
+      "GSAP (GreenSock Animation Platform)",
+      "ScrollTrigger (Scroll-Driven Interactive Timelines)",
+      "Lenis (Smooth Scroll Integration)",
+      "Vercel",
+      "Git / GitHub"
+    ],
     image: "/images/projects/valentine.png",
     demo: "https://www.w3schools.com/html/mov_bbb.mp4"
   },
@@ -305,7 +332,11 @@ const WorksStacked = () => {
                   {/* Close Button */}
                   <button 
                     onClick={closeTab}
-                    className="absolute top-8 right-8 md:top-12 md:right-12 w-12 h-12 text-white/80 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center z-[60] hover:scale-110 hover:bg-white/20 transition-all shadow-lg"
+                    className={`absolute top-8 right-8 md:top-12 md:right-12 w-12 h-12 rounded-full flex items-center justify-center z-[60] hover:scale-110 transition-all shadow-lg backdrop-blur-md border ${
+                      work.id === 'lastpage' && currentTab === 'tech stack'
+                        ? 'text-black/80 bg-black/10 border-black/20 hover:bg-black/20'
+                        : 'text-white/80 bg-white/10 border-white/20 hover:bg-white/20'
+                    }`}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
