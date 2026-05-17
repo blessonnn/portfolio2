@@ -131,6 +131,30 @@ const HobbiesSection = () => {
     { scope: containerRef }
   );
 
+  useGSAP(() => {
+    if (activeHobby) {
+      const items = document.querySelectorAll(".hobby-image-item");
+      items.forEach((item) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: item,
+              scroller: "#hobby-scroll-container",
+              start: "top bottom-=50",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+    }
+  }, { dependencies: [activeHobby] });
+
   return (
     <section
       ref={containerRef}
@@ -153,21 +177,11 @@ const HobbiesSection = () => {
         {activeHobby === null ? (
           /* List View */
           <div className="flex-1 flex flex-col justify-center max-w-5xl mx-auto w-full relative">
-            <button
-              onClick={() => {
-                if (containerRef.current) {
-                  window.scrollTo({ top: containerRef.current.offsetTop, behavior: 'smooth' });
-                }
-              }}
-              className="absolute -top-16 left-4 md:left-6 text-xl md:text-2xl text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-            >
-              &larr; Back
-            </button>
             {HOBBIES.map((hobby) => (
               <div
                 key={hobby.id}
                 onClick={() => setActiveHobby(hobby.id)}
-                className="hobby-list-item group relative border-b border-white/20 py-8 md:py-10 cursor-pointer overflow-hidden transition-colors"
+                className="hobby-list-item group relative border-b border-white/20 py-5 md:py-6 cursor-pointer overflow-hidden transition-colors"
               >
                 {/* Random color hover background */}
                 <div
@@ -190,37 +204,38 @@ const HobbiesSection = () => {
         ) : (
           /* Grid View (Fixed Overlay) */
           <div 
-            className="fixed inset-0 z-[200] bg-[#0a0a0a] flex flex-col h-screen overflow-y-auto no-scrollbar animate-in fade-in duration-300"
+            id="hobby-scroll-container"
+            className="fixed inset-0 z-[200] bg-white text-black flex flex-col h-screen overflow-y-auto no-scrollbar animate-in fade-in duration-300"
             data-lenis-prevent="true"
           >
             <div className="max-w-7xl mx-auto w-full px-4 md:px-12 pt-8 pb-20">
               {/* Header / Back Button */}
-              <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#0a0a0a] z-20 py-4">
+              <div className="flex items-center justify-between mb-8 sticky top-0 bg-white z-20 py-4">
                 <button
                   onClick={() => setActiveHobby(null)}
-                  className="text-xl md:text-2xl font-medium hover:text-gray-400 transition-colors flex items-center gap-2"
+                  className="text-xl md:text-2xl font-medium hover:text-gray-500 transition-colors flex items-center gap-2"
                 >
                   &larr; Back
                 </button>
-                <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-[var(--accent,white)]">
+                <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-black">
                   {HOBBIES.find((h) => h.id === activeHobby)?.title}
                 </h3>
               </div>
 
               {/* Grid Container */}
-              <div className="group grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-[1px] w-full bg-white/20 p-[1px]">
+              <div className="group grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 w-full bg-white">
                 {HOBBIES.find((h) => h.id === activeHobby)?.images.map((src, i) => (
                   <a
                     href={src}
                     target="_blank"
                     rel="noopener noreferrer"
                     key={i}
-                    className="relative aspect-[3/4] bg-[#0a0a0a] overflow-hidden group-hover:[&:not(:hover)]:brightness-50 transition-all duration-300 block"
+                    className="hobby-image-item relative aspect-[3/4] bg-gray-100 overflow-hidden rounded-none group-hover:[&:not(:hover)]:opacity-50 transition-all duration-300 block shadow-sm hover:shadow-xl hover:-translate-y-1"
                   >
                   <img
                     src={src}
                     alt={`Hobby img ${i}`}
-                    className="w-full h-full object-cover rounded-none"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
                 </a>

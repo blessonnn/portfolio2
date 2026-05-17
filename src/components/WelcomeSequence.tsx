@@ -1,130 +1,205 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const languages = [
+  "Welcome",
+  "Bienvenido",
+  "Bienvenue",
+  "Willkommen",
+  "Benvenuto",
+  "ようこそ",
+  "환영합니다",
+  "欢迎"
+];
+
+const heyLanguages = [
+  "Hey",
+  "Hola",
+  "Salut",
+  "Hallo",
+  "Ciao",
+  "やあ",
+  "안녕",
+  "你好"
+];
+
+const allLanguages = [
+  "All",
+  "Todos",
+  "Tous",
+  "Alle",
+  "Tutti",
+  "みんな",
+  "여러분",
+  "大家"
+];
+
+const FRAME_COUNT = 40;
+
 export default function WelcomeSequence() {
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const scaleVal = useRef(15);
-  const maskOpacity = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLHeadingElement>(null);
+  const heyRef = useRef<HTMLHeadingElement>(null);
+  const allRef = useRef<HTMLHeadingElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const imgContainerRef = useRef<HTMLDivElement>(null);
 
-  const drawMask = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.width;
-    const h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-    if (maskOpacity.current <= 0) return;
-
-    // Blue fill
-    ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = maskOpacity.current;
-    ctx.fillStyle = "#3874FF";
-    ctx.fillRect(0, 0, w, h);
-
-    // Punch out text
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "black";
-
-    const baseFontSize = (w / dpr) * 0.12;
-    const fontSize = baseFontSize * scaleVal.current;
-    ctx.font = `900 ${fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const gap = fontSize * 0.1;
-    ctx.fillText("WELCOME", w / 2, h / 2 - gap);
-    ctx.fillText("ALL", w / 2, h / 2 + fontSize * 0.9);
-
-    ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = 1;
+  // Preload images to avoid flickering on scroll
+  useEffect(() => {
+    for (let i = 1; i <= FRAME_COUNT; i++) {
+      const img = new window.Image();
+      const frameNum = i.toString().padStart(3, "0");
+      img.src = `/welcome-section/ezgif-frame-${frameNum}.jpg`;
+    }
   }, []);
 
-  useEffect(() => {
-    const resize = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      drawMask();
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, [drawMask]);
-
   useGSAP(() => {
-    if (!triggerRef.current) return;
+    if (!containerRef.current || !textRef.current || !imgRef.current || !imgContainerRef.current || !heyRef.current || !allRef.current) return;
 
-    ScrollTrigger.create({
-      trigger: triggerRef.current,
-      start: "top bottom",
-      end: "bottom top",
-      onUpdate: (self) => {
-        const p = self.progress;
-
-        // Phase 1 (0→0.15): Mask morphs in
-        if (p < 0.15) {
-          maskOpacity.current = p / 0.15;
-          scaleVal.current = 15;
-        }
-        // Phase 2 (0.15→0.7): Text zooms from 15→1
-        else if (p < 0.7) {
-          maskOpacity.current = 1;
-          const zp = (p - 0.15) / 0.55;
-          const eased = gsap.parseEase("power2.out")(zp);
-          scaleVal.current = gsap.utils.interpolate(15, 1, eased);
-        }
-        // Phase 3 (0.7→0.85): Hold
-        else if (p < 0.85) {
-          maskOpacity.current = 1;
-          scaleVal.current = 1;
-        }
-        // Phase 4 (0.85→1.0): Mask fades out
-        else {
-          maskOpacity.current = 1 - (p - 0.85) / 0.15;
-          scaleVal.current = 1;
-        }
-
-        // Show/hide wrapper
-        if (wrapperRef.current) {
-          wrapperRef.current.style.opacity = maskOpacity.current > 0 ? "1" : "0";
-          wrapperRef.current.style.pointerEvents = maskOpacity.current > 0 ? "none" : "none";
-        }
-
-        drawMask();
+    // Background Image Animation
+    gsap.fromTo(imgContainerRef.current,
+      {
+        width: "24vw",
+        height: "16vh",
+        top: "100%",
+        xPercent: -50,
+        yPercent: -100, // Anchored at the bottom
+        borderRadius: "0px",
       },
-    });
-  }, { scope: triggerRef });
+      {
+        width: "100vw",
+        height: "100vh",
+        top: "50%",
+        xPercent: -50,
+        yPercent: -50, // Moves to center
+        borderRadius: "0px",
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top", 
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            
+            // Map progress to language array index
+            const textIndex = Math.min(
+              Math.floor(progress * languages.length),
+              languages.length - 1
+            );
+            
+            // Map progress to image frame (1 to 28)
+            const frameIndex = Math.min(
+              Math.floor(progress * FRAME_COUNT) + 1,
+              FRAME_COUNT
+            );
+            
+            if (textRef.current && textRef.current.innerText !== languages[textIndex]) {
+              textRef.current.innerText = languages[textIndex];
+            }
+
+            if (heyRef.current && heyRef.current.innerText !== heyLanguages[textIndex]) {
+              heyRef.current.innerText = heyLanguages[textIndex];
+            }
+
+            if (allRef.current && allRef.current.innerText !== allLanguages[textIndex]) {
+              allRef.current.innerText = allLanguages[textIndex];
+            }
+
+            if (imgRef.current) {
+              const frameStr = frameIndex.toString().padStart(3, "0");
+              const newSrc = `/welcome-section/ezgif-frame-${frameStr}.jpg`;
+              if (!imgRef.current.src.endsWith(newSrc)) {
+                 imgRef.current.src = newSrc;
+              }
+            }
+          }
+        }
+      }
+    );
+
+    // "Hey" Text Animation (Sliding from left)
+    gsap.fromTo(heyRef.current,
+      { x: "-38vw", opacity: 1 },
+      { 
+        x: "-1.5rem", 
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+        }
+      }
+    );
+
+    // "All" Text Animation (Sliding from right)
+    gsap.fromTo(allRef.current,
+      { x: "38vw", opacity: 1 },
+      { 
+        x: "1.5rem", 
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+        }
+      }
+    );
+
+  }, { scope: containerRef });
 
   return (
-    <>
-      {/* Scroll trigger — provides scroll distance, visually empty */}
-      <div ref={triggerRef} id="welcome" className="w-full h-[300vh]" />
+    <div id="welcome" ref={containerRef} className="w-full h-[350vh] relative z-20 bg-black">
+      <div className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden">
+        
+        {/* Background Image Sequence */}
+        <div 
+          ref={imgContainerRef}
+          className="absolute left-1/2 overflow-hidden mix-blend-screen pointer-events-none z-0"
+        >
+          <img 
+            ref={imgRef}
+            src="/welcome-section/ezgif-frame-001.jpg"
+            alt="Welcome background sequence"
+            className="w-full h-full object-cover opacity-50"
+          />
+        </div>
 
-      {/* Fixed canvas overlay — never slides, morphs in-place */}
-      <div
-        ref={wrapperRef}
-        className="fixed inset-0 z-20 pointer-events-none"
-        style={{ opacity: 0 }}
-      >
-        <canvas ref={canvasRef} className="w-full h-full" />
+        {/* Text Layer */}
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Top Converging Text */}
+          <div className="flex items-center justify-center mb-2 md:mb-4">
+             <h2 
+              ref={heyRef} 
+              className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-wider text-white/80 drop-shadow-2xl"
+            >
+              Hey
+            </h2>
+            <h2 
+              ref={allRef} 
+              className="text-3xl md:text-5xl lg:text-7xl font-bold uppercase tracking-wider text-white/80 drop-shadow-2xl"
+            >
+              All
+            </h2>
+          </div>
+
+          {/* Main Welcome Text */}
+          <h2 
+            ref={textRef} 
+            className="text-4xl md:text-6xl lg:text-8xl font-bold uppercase tracking-wider text-white drop-shadow-2xl"
+          >
+            Welcome
+          </h2>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

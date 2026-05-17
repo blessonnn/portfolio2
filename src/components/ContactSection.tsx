@@ -42,13 +42,30 @@ const links = [
   { label: "Behance", href: "https://www.behance.net/monuyt", icon: <BehanceIcon /> },
 ];
 
+const NAV_ITEMS = [
+  { name: "Welcome", href: "#welcome" },
+  { name: "Skills", href: "#skills" },
+  { name: "Hobby", href: "#hobbies" },
+  { name: "Works", href: "#works" },
+  { name: "About Me", href: "#about" },
+  { name: "Contact", href: "#contact" },
+];
+
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useGSAP(() => {
     if (!sectionRef.current) return;
 
-    gsap.fromTo(
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top 75%",
+        toggleActions: "play none none reverse",
+      }
+    });
+
+    tl.fromTo(
       ".blesson-char",
       { y: "120%", opacity: 0 },
       {
@@ -57,34 +74,59 @@ export default function ContactSection() {
         duration: 1.2,
         stagger: 0.1,
         ease: "power4.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-          toggleActions: "play none none reverse",
-        }
       }
+    ).fromTo(
+      ".connect-char",
+      { y: "120%", opacity: 0 },
+      {
+        y: "0%",
+        opacity: 1,
+        duration: 1.2,
+        stagger: 0.05,
+        ease: "power4.out",
+      },
+      "-=0.8"
     );
   }, { scope: sectionRef });
 
   return (
     <div className="bg-white w-full">
       <section ref={sectionRef} id="contact" className="w-full bg-[#3874FF] pt-24 pb-12 px-6 md:px-12 flex flex-col justify-between min-h-[60vh] rounded-t-[2rem]">
-        <div className="flex flex-col mb-16">
-          <h1 
-            className="text-[12vw] leading-none text-black uppercase tracking-tighter flex overflow-hidden"
-            style={{ fontFamily: "'Martian Mono', monospace" }}
-          >
-            {"Blesson".split("").map((char, index) => (
-              <span key={index} className="blesson-char inline-block">
-                {char}
-              </span>
-            ))}
-          </h1>
+        <div className="flex flex-col mb-16 w-full">
+          <div className="flex flex-col md:flex-row justify-between md:items-end w-full gap-8">
+            <h1 
+              className="text-[12vw] leading-none text-black uppercase tracking-tighter flex overflow-hidden"
+              style={{ fontFamily: "'Martian Mono', monospace" }}
+            >
+              {"Blesson".split("").map((char, index) => (
+                <span key={index} className="blesson-char inline-block">
+                  {char}
+                </span>
+              ))}
+            </h1>
+            
+            <div className="hidden md:flex flex-col gap-2 items-end mb-0 translate-y-2 md:translate-y-4">
+              {NAV_ITEMS.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="relative text-black text-sm uppercase tracking-widest font-bold group/navlink overflow-hidden pb-1"
+                >
+                  {item.name}
+                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-black transform scale-x-0 group-hover/navlink:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] origin-left" />
+                </a>
+              ))}
+            </div>
+          </div>
           <p 
-            className="text-black text-2xl md:text-5xl font-medium mt-6 tracking-tight" 
+            className="text-black text-2xl md:text-5xl font-medium mt-6 tracking-tight flex overflow-hidden" 
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            let's connect
+            {"let's connect".split("").map((char, index) => (
+              <span key={index} className="connect-char inline-block">
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
           </p>
         </div>
 
