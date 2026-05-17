@@ -107,8 +107,8 @@ export default function WelcomeSequence() {
           {/* Centered Text */}
           <h2
             ref={textRef}
-            className="relative z-10 text-2xl md:text-4xl lg:text-5xl font-semibold text-white text-center px-8 drop-shadow-2xl tracking-wide"
-            style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif", opacity: 0 }}
+            className="relative z-10 text-2xl md:text-4xl lg:text-5xl font-light text-white text-center px-8 drop-shadow-2xl tracking-wide"
+            style={{ fontFamily: "'Times New Roman', 'Georgia', 'Garamond', serif", opacity: 0, fontWeight: 300 }}
           >
             Hey there, welcome!
           </h2>
