@@ -40,12 +40,84 @@ const HOBBIES = [
   },
 ];
 
+const StepperProgress = ({ active }: { active: boolean }) => {
+  return (
+    <div className="relative flex items-center justify-between w-24 md:w-32 h-6 pointer-events-none select-none">
+      {/* Background Line */}
+      <div 
+        className={`absolute left-0 right-0 h-[2px] z-0 transition-colors duration-300 ${
+          active ? "bg-black/20" : "bg-white/20"
+        }`} 
+      />
+      
+      {/* Animated Progress Line */}
+      <div 
+        className={`absolute left-0 h-[2px] bg-black z-0 origin-left transition-all duration-1000 ease-out ${
+          active ? "w-[66%]" : "w-0"
+        }`}
+        style={{ transitionDelay: active ? "100ms" : "0ms" }}
+      />
+      
+      {/* 4 Dots */}
+      <div className="absolute inset-0 flex justify-between items-center z-10">
+        {/* Dot 1 */}
+        <div 
+          className={`w-3 h-3 rounded-full border transition-all duration-300 ${
+            active ? "bg-black border-black" : "bg-transparent border-white/40"
+          }`}
+          style={{ transitionDelay: active ? "100ms" : "0ms" }}
+        />
+        {/* Dot 2 */}
+        <div 
+          className={`w-3 h-3 rounded-full border transition-all duration-300 ${
+            active ? "bg-black border-black" : "bg-transparent border-white/40"
+          }`}
+          style={{ transitionDelay: active ? "400ms" : "0ms" }}
+        />
+        {/* Dot 3 */}
+        <div 
+          className={`w-3 h-3 rounded-full border transition-all duration-300 ${
+            active ? "bg-black border-black" : "bg-transparent border-white/40"
+          }`}
+          style={{ transitionDelay: active ? "700ms" : "0ms" }}
+        />
+        {/* Dot 4 */}
+        <div 
+          className={`w-3 h-3 rounded-full border transition-all duration-300 ${
+            active ? "bg-transparent border-black" : "bg-transparent border-white/40"
+          }`}
+        />
+      </div>
+    </div>
+  );
+};
+
 const HobbiesSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   
   const [activeHobby, setActiveHobby] = useState<string | null>(null);
+  const [inProgressId, setInProgressId] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleHobbyClick = (id: string) => {
+    if (["drawing", "sound-designing", "musical-instruments"].includes(id)) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setInProgressId(id);
+      timeoutRef.current = setTimeout(() => {
+        setInProgressId(null);
+      }, 2500);
+    } else {
+      setActiveHobby(id);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     // Handle lenis if it's attached globally
@@ -183,30 +255,51 @@ const HobbiesSection = () => {
       >
         {activeHobby === null ? (
           /* List View */
-          <div className="flex-1 flex flex-col justify-center max-w-5xl mx-auto w-full relative">
-            {HOBBIES.map((hobby) => (
-              <div
-                key={hobby.id}
-                onClick={() => setActiveHobby(hobby.id)}
-                className="hobby-list-item group relative border-b border-white/20 py-5 md:py-6 cursor-pointer overflow-hidden transition-colors"
-              >
-                {/* Random color hover background */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ backgroundColor: hobby.color }}
-                />
+          <div className="flex-1 flex flex-col justify-center w-full relative">
+            {HOBBIES.map((hobby) => {
+              const isInProgress = inProgressId === hobby.id;
 
-                {/* Text Content */}
-                <div className="relative z-10 flex items-center justify-between px-6">
-                  <h3 className="text-4xl md:text-6xl font-medium text-white group-hover:text-black transition-colors duration-300">
-                    {hobby.title}
-                  </h3>
-                  <span className="text-3xl opacity-0 group-hover:opacity-100 group-hover:text-black transition-all duration-300 -translate-x-4 group-hover:translate-x-0">
-                    &rarr;
-                  </span>
+              return (
+                <div
+                  key={hobby.id}
+                  onClick={() => handleHobbyClick(hobby.id)}
+                  className="hobby-list-item group relative border-b border-white/20 py-5 md:py-6 cursor-pointer overflow-hidden transition-colors"
+                >
+                  {/* Random color hover background */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style={{ backgroundColor: hobby.color }}
+                  />
+
+                  {/* Text Content */}
+                  <div className="relative z-10 flex items-center justify-between px-6 md:px-12">
+                    <div className="relative h-12 md:h-16 flex items-center w-full overflow-hidden">
+                      {/* Original Title */}
+                      <h3 className={`absolute left-0 text-4xl md:text-6xl font-medium text-white group-hover:text-black transition-all duration-500 transform ${isInProgress ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+                        {hobby.title}
+                      </h3>
+                      {/* "In Progress" Message */}
+                      <h3 className={`absolute left-0 text-4xl md:text-6xl font-medium text-white group-hover:text-black transition-all duration-500 transform ${isInProgress ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+                        In Progress
+                      </h3>
+                    </div>
+                    <div className="relative w-24 md:w-32 h-6 flex items-center justify-end">
+                      {/* Default Arrow */}
+                      <span className={`absolute right-0 text-3xl opacity-0 group-hover:opacity-100 group-hover:text-black transition-all duration-300 -translate-x-4 group-hover:translate-x-0 ${isInProgress ? 'opacity-0 scale-0 pointer-events-none' : ''}`}>
+                        &rarr;
+                      </span>
+
+                      {/* Stepper Progress Bar */}
+                      {["drawing", "sound-designing", "musical-instruments"].includes(hobby.id) && (
+                        <div className={`absolute right-0 transition-all duration-500 transform ${isInProgress ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-50 translate-x-4 pointer-events-none'}`}>
+                          <StepperProgress active={isInProgress} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* Grid View (Fixed Overlay) */
@@ -241,7 +334,7 @@ const HobbiesSection = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     key={i}
-                    className="hobby-image-item relative aspect-[3/4] bg-gray-100 overflow-hidden rounded-none group-hover:[&:not(:hover)]:opacity-50 transition-all duration-300 block shadow-sm hover:shadow-xl hover:-translate-y-1"
+                    className="hobby-image-item relative aspect-[3/4] bg-gray-100 overflow-hidden rounded-none transition-all duration-300 block shadow-sm hover:shadow-xl hover:-translate-y-1"
                   >
                   <img
                     src={src}

@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import WelcomeSequence from "@/components/WelcomeSequence";
 import SectionReveal from "@/components/SectionReveal";
 import WorksStacked from "@/components/WorksStacked";
-import SkillsMarquee from "@/components/SkillsMarquee";
+import SkillsSection from "@/components/SkillsSection";
 import SmoothScroll from "@/components/SmoothScroll";
 import HobbiesSection from "@/components/HobbiesSection";
 import AboutMeSection from "@/components/AboutMeSection";
@@ -30,8 +30,8 @@ export default function Home() {
         
         <WelcomeSequence />
 
-        <SectionReveal title="Skills" id="skills">
-          <SkillsMarquee />
+        <SectionReveal title="Skills" id="skills" fullWidth titleColor="white" revealFromBehind>
+          <SkillsSection />
         </SectionReveal>
 
         <HobbiesSection />

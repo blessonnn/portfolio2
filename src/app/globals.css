@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Instrument+Serif:ital@0;1&family=Martian+Mono:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Instrument+Serif:ital@0;1&family=Martian+Mono:wght@100..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -7,6 +7,9 @@
   --accent: #3874ff;
   --font-doto: "Doto", sans-serif;
   --font-instrument: "Instrument Serif", serif;
+  --font-mono: "Martian Mono", monospace;
+  --font-playfair: "Playfair Display", serif;
+  --font-syne: "Syne", sans-serif;
 }
 
 @theme inline {
@@ -15,6 +18,9 @@
   --color-accent: var(--accent);
   --font-family-doto: var(--font-doto);
   --font-family-instrument: var(--font-instrument);
+  --font-family-mono: var(--font-mono);
+  --font-family-playfair: var(--font-playfair);
+  --font-family-syne: var(--font-syne);
 }
 
 body {
@@ -63,4 +69,20 @@ html.lenis, html.lenis body {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+@keyframes marquee-ltr {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}
+
+.animate-marquee-ltr {
+  display: flex;
+  width: max-content;
+  animation: marquee-ltr 22s linear infinite;
+  will-change: transform;
 }
