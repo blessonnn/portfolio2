@@ -164,9 +164,23 @@ const WorksStacked = () => {
       y = rect.top + rect.height / 2;
     }
     setActiveTab({ id: workId, tab, x, y });
+    gsap.to("#navbar-container", {
+      opacity: 0,
+      pointerEvents: "none",
+      duration: 0.3,
+      ease: "power2.out"
+    });
   };
 
-  const closeTab = () => setActiveTab(null);
+  const closeTab = () => {
+    setActiveTab(null);
+    gsap.to("#navbar-container", {
+      opacity: 1,
+      pointerEvents: "auto",
+      duration: 0.4,
+      ease: "power2.out"
+    });
+  };
 
   useGSAP(
     () => {
@@ -215,10 +229,42 @@ const WorksStacked = () => {
               // Animate other standard reveal-items (like buttons)
               const standardItems = card.querySelectorAll(".reveal-item");
               if (standardItems.length > 0) {
-                gsap.fromTo(standardItems,
-                  { y: 50, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out", overwrite: "auto" }
-                );
+                const buttons = card.querySelectorAll(".reveal-item button");
+                if (buttons.length > 0) {
+                  // Measure the first button offset
+                  const firstBtn = buttons[0] as HTMLElement;
+                  const firstLeft = firstBtn.offsetLeft;
+
+                  // Fade in the container itself
+                  gsap.fromTo(standardItems,
+                    { opacity: 0, y: 0 },
+                    { opacity: 1, y: 0, duration: 0.4, overwrite: "auto" }
+                  );
+
+                  // Animate individual buttons
+                  buttons.forEach((btn, btnIdx) => {
+                    const el = btn as HTMLElement;
+                    const targetX = firstLeft - el.offsetLeft;
+
+                    gsap.fromTo(el,
+                      { x: targetX, opacity: 0, scale: 0.8 },
+                      {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 1.0,
+                        delay: btnIdx * 0.08,
+                        ease: "power3.out",
+                        overwrite: "auto"
+                      }
+                    );
+                  });
+                } else {
+                  gsap.fromTo(standardItems,
+                    { y: 50, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out", overwrite: "auto" }
+                  );
+                }
               }
             } else if (this.progress() < 0.1 && animationTriggered) {
               // Reset the animation if scrolled back down
@@ -230,6 +276,9 @@ const WorksStacked = () => {
 
               const standardItems = card.querySelectorAll(".reveal-item");
               gsap.set(standardItems, { opacity: 0, y: 50 });
+
+              const buttons = card.querySelectorAll(".reveal-item button");
+              gsap.set(buttons, { x: 0, opacity: 0, scale: 1 });
             }
           }
         });

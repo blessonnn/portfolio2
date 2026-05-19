@@ -158,7 +158,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
+    <div id="navbar-container" className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
       <nav
         id="main-nav"
         ref={navRef}
