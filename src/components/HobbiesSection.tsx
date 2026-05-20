@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -36,7 +37,11 @@ const HOBBIES = [
     id: "musical-instruments",
     title: "Musical Instruments",
     color: "#B366FF",
-    images: Array.from({ length: 1 }, (_, i) => `/images/musical-instruments/${i + 1}.jpg`),
+    images: [
+      "/images/musical-instruments/me-guitar.png",
+      "/images/musical-instruments/me-keyboard.png",
+      "/images/musical-instruments/me-ukulele.png",
+    ],
   },
 ];
 
@@ -103,9 +108,10 @@ const HobbiesSection = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const gridOverlayRef = useRef<HTMLDivElement>(null);
   const gridContentRef = useRef<HTMLDivElement>(null);
+  const hasOpenedHobby = useRef(false);
 
   const handleHobbyClick = (id: string, e: React.MouseEvent) => {
-    if (["drawing", "sound-designing", "musical-instruments"].includes(id)) {
+    if (["drawing", "sound-designing"].includes(id)) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setInProgressId(id);
       timeoutRef.current = setTimeout(() => {
@@ -115,6 +121,7 @@ const HobbiesSection = () => {
       const rect = e.currentTarget.getBoundingClientRect();
       setClickedRowRect(rect);
       setActiveHobby(id);
+      hasOpenedHobby.current = true;
     }
   };
 
@@ -240,7 +247,7 @@ const HobbiesSection = () => {
   }, { dependencies: [activeHobby] });
 
   const handleCloseGrid = () => {
-    if (!gridOverlayRef.current || !gridContentRef.current || !clickedRowRect) {
+    if (!gridOverlayRef.current || !gridContentRef.current) {
       setActiveHobby(null);
       setClickedRowRect(null);
       return;
@@ -249,14 +256,13 @@ const HobbiesSection = () => {
     gsap.timeline()
       .to(gridContentRef.current, {
         opacity: 0,
-        y: 20,
+        y: -40,
         duration: 0.25,
         ease: "power2.in"
       })
       .to(gridOverlayRef.current, {
-        top: clickedRowRect.top,
-        height: clickedRowRect.height,
-        duration: 0.6,
+        y: "-100%",
+        duration: 0.45,
         ease: "power3.inOut"
       }, "-=0.1")
       .to("#navbar-container", {
@@ -264,12 +270,25 @@ const HobbiesSection = () => {
         pointerEvents: "auto",
         duration: 0.4,
         ease: "power2.out"
-      }, "-=0.3")
+      }, "-=0.25")
       .add(() => {
         setActiveHobby(null);
         setClickedRowRect(null);
+        gsap.set(gridOverlayRef.current, { y: "0%" });
       });
   };
+
+  useEffect(() => {
+    if (activeHobby === null && hasOpenedHobby.current) {
+      const listItems = containerRef.current?.querySelectorAll(".hobby-list-item");
+      if (listItems && listItems.length > 0) {
+        gsap.fromTo(listItems,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: "power2.out", overwrite: "auto" }
+        );
+      }
+    }
+  }, [activeHobby]);
 
   useGSAP(() => {
     if (activeHobby && clickedRowRect && gridOverlayRef.current && gridContentRef.current) {
@@ -329,7 +348,7 @@ const HobbiesSection = () => {
         ref={contentRef}
         className="absolute inset-0 w-full h-full flex flex-col opacity-0 pointer-events-none z-10 pt-24 px-0 pb-12 overflow-hidden"
       >
-        {activeHobby === null ? (
+        {activeHobby === null && (
           /* List View */
           <div className="flex-1 flex flex-col justify-center w-full relative">
             {HOBBIES.map((hobby) => {
@@ -366,7 +385,7 @@ const HobbiesSection = () => {
                       </span>
 
                       {/* Stepper Progress Bar */}
-                      {["drawing", "sound-designing", "musical-instruments"].includes(hobby.id) && (
+                      {["drawing", "sound-designing"].includes(hobby.id) && (
                         <div className={`absolute right-0 transition-all duration-500 transform ${isInProgress ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-50 translate-x-4 pointer-events-none'}`}>
                           <StepperProgress active={isInProgress} />
                         </div>
@@ -377,39 +396,62 @@ const HobbiesSection = () => {
               );
             })}
           </div>
-        ) : (
-          /* Grid View (Fixed Overlay) */
-          <div 
-            ref={gridOverlayRef}
-            className="fixed left-0 right-0 z-[200] text-black flex flex-col overflow-hidden"
-            style={{ 
-              backgroundColor: HOBBIES.find((h) => h.id === activeHobby)?.color || "#ffffff",
-              top: clickedRowRect ? `${clickedRowRect.top}px` : "0px",
-              height: clickedRowRect ? `${clickedRowRect.height}px` : "100vh",
-              opacity: clickedRowRect ? 0 : 1
-            }}
-          >
-            <div ref={gridContentRef} className="w-full h-full flex flex-col overflow-hidden relative">
-              {/* Header / Back Button */}
-              <div className="w-full max-w-7xl mx-auto px-4 md:px-12 pt-8 pb-4 flex items-center justify-between z-10 shrink-0">
-                <button
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCloseGrid(); }}
-                  className="px-6 py-2 bg-black text-white text-xl md:text-2xl font-medium rounded-full hover:bg-black/80 transition-colors flex items-center gap-2 cursor-pointer shadow-2xl"
-                >
-                  &larr; Back
-                </button>
-                <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-black">
-                  {HOBBIES.find((h) => h.id === activeHobby)?.title}
-                </h3>
-              </div>
+        )}
+      </div>
 
-              {/* Scrollable Grid Container */}
-              <div 
-                id="hobby-scroll-container"
-                className="flex-1 w-full overflow-y-auto no-scrollbar pb-32"
-                data-lenis-prevent="true"
+      {/* Grid View (Fixed Overlay rendered via Portal) */}
+      {activeHobby !== null && typeof window !== "undefined" && createPortal(
+        <div 
+          ref={gridOverlayRef}
+          className="fixed left-0 right-0 z-[200] text-black flex flex-col overflow-hidden"
+          style={{ 
+            backgroundColor: HOBBIES.find((h) => h.id === activeHobby)?.color || "#ffffff",
+            top: clickedRowRect ? `${clickedRowRect.top}px` : "0px",
+            height: clickedRowRect ? `${clickedRowRect.height}px` : "100vh",
+            opacity: clickedRowRect ? 0 : 1
+          }}
+        >
+          <div ref={gridContentRef} className="w-full h-full flex flex-col overflow-hidden relative">
+            {/* Header / Back Button */}
+            <div className="w-full max-w-7xl mx-auto px-4 md:px-12 pt-8 pb-4 flex items-center justify-between z-10 shrink-0">
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCloseGrid(); }}
+                className="px-6 py-2 bg-black text-white text-xl md:text-2xl font-medium rounded-full hover:bg-black/80 transition-colors flex items-center gap-2 cursor-pointer shadow-2xl"
               >
-                <div className="max-w-7xl mx-auto w-full px-4 md:px-12">
+                &larr; Back
+              </button>
+              <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-black">
+                {HOBBIES.find((h) => h.id === activeHobby)?.title}
+              </h3>
+            </div>
+
+            {/* Scrollable Grid Container */}
+            <div 
+              id="hobby-scroll-container"
+              className="flex-1 w-full overflow-y-auto no-scrollbar pb-32"
+              data-lenis-prevent="true"
+            >
+              <div className="max-w-7xl mx-auto w-full px-4 md:px-12">
+                {activeHobby === "musical-instruments" ? (
+                  <div className="flex flex-col gap-12 md:gap-16 max-w-4xl mx-auto w-full">
+                    {HOBBIES.find((h) => h.id === activeHobby)?.images.map((src, i) => (
+                      <a
+                        href={src}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        key={i}
+                        className="hobby-image-item relative w-full overflow-hidden transition-all duration-300 block shadow-md hover:shadow-2xl hover:-translate-y-1"
+                      >
+                        <img
+                          src={src}
+                          alt={`Hobby img ${i}`}
+                          className="w-full h-auto object-contain"
+                          loading="lazy"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                ) : (
                   <div className="group grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 w-full">
                     {HOBBIES.find((h) => h.id === activeHobby)?.images.map((src, i) => (
                       <a
@@ -428,25 +470,35 @@ const HobbiesSection = () => {
                       </a>
                     ))}
                   </div>
-                </div>
+                )}
               </div>
-
-              {/* Bottom Gaussian Linear Gradient Blur Overlay (50% Opacity) */}
-              <div
-                className="absolute bottom-0 left-0 w-full pointer-events-none z-20"
-                style={{
-                  height: "15vh",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  maskImage: "linear-gradient(to top, black 0%, black 20%, transparent 100%)",
-                  WebkitMaskImage: "linear-gradient(to top, black 0%, black 20%, transparent 100%)",
-                  opacity: 0.5
-                }}
-              />
             </div>
+
+            {/* Bottom Gaussian Linear Gradient Blur Overlay (50% Opacity) */}
+            <div
+              className="absolute bottom-0 left-0 w-full pointer-events-none z-20"
+              style={{
+                height: "15vh",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                maskImage: "linear-gradient(to top, black 0%, black 20%, transparent 100%)",
+                WebkitMaskImage: "linear-gradient(to top, black 0%, black 20%, transparent 100%)",
+                opacity: 0.5
+              }}
+            />
+
+            {/* Bottom Black Linear Gradient Overlay (50% Opacity) */}
+            <div
+              className="absolute bottom-0 left-0 w-full pointer-events-none z-30 bg-gradient-to-t from-black to-transparent"
+              style={{
+                height: "15vh",
+                opacity: 0.5
+              }}
+            />
           </div>
-        )}
-      </div>
+        </div>,
+        document.body
+      )}
     </section>
   );
 };

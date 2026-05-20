@@ -44,6 +44,31 @@ export default function AboutMeSection() {
       ease: "power2.out"
     }, "<");
 
+    // Block reveal animation for the heading lines
+    const headingBlocks = gsap.utils.toArray(".about-heading-block") as HTMLElement[];
+    const headingTexts = gsap.utils.toArray(".about-heading-text") as HTMLElement[];
+
+    headingBlocks.forEach((block, index) => {
+      const text = headingTexts[index];
+      const lineTl = gsap.timeline();
+      
+      lineTl.to(block, {
+        scaleX: 1,
+        duration: 0.5,
+        ease: "power3.inOut"
+      })
+      .set(text, { opacity: 1 })
+      .to(block, {
+        transformOrigin: "right",
+        scaleX: 0,
+        duration: 0.5,
+        ease: "power3.inOut"
+      });
+
+      // Add each line animation to the main timeline with a slight overlap
+      tl.add(lineTl, index === 0 ? "-=0.8" : "-=0.7");
+    });
+
     // Word by word reveal
     tl.from(".about-word", {
       opacity: 0,
@@ -51,7 +76,7 @@ export default function AboutMeSection() {
       stagger: 0.015,
       duration: 0.8,
       ease: "power3.out",
-    }, "-=0.8");
+    }, "-=0.4");
 
     // Background text scroll animation (bottom-right entry to left)
     gsap.fromTo(bgTextRef.current,
@@ -126,10 +151,20 @@ export default function AboutMeSection() {
           />
         </div>
 
-        {/* Right Side: Text */}
         <div ref={textRef} className="flex flex-col gap-6 md:pl-20">
-          <h2 className="text-2xl md:text-4xl font-bold text-black uppercase tracking-tighter leading-tight about-word">
-            Creative Designer & <br /> Tech Enthusiast
+          <h2 className="text-2xl md:text-4xl font-bold text-black uppercase tracking-tighter leading-none flex flex-col gap-1 items-start">
+            <span className="relative inline-block overflow-hidden py-1">
+              <span className="about-heading-text inline-block opacity-0">
+                Creative Designer &
+              </span>
+              <span className="about-heading-block absolute inset-0 bg-[#3874FF] origin-left scale-x-0" />
+            </span>
+            <span className="relative inline-block overflow-hidden py-1">
+              <span className="about-heading-text inline-block opacity-0">
+                Tech Enthusiast
+              </span>
+              <span className="about-heading-block absolute inset-0 bg-[#3874FF] origin-left scale-x-0" />
+            </span>
           </h2>
 
           <div className="flex flex-wrap gap-x-[0.4em] gap-y-0 max-w-2xl">
