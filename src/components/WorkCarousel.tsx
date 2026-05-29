@@ -541,7 +541,7 @@ const WorkCarousel: React.FC = () => {
           font-weight: 900;
           text-transform: uppercase;
           letter-spacing: -0.02em; /* Tight letter spacing for bold titles */
-          color: #ffffff;
+          color: #000000;
           line-height: 1.1;
           text-align: center;
           user-select: none;
