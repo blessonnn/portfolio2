@@ -240,7 +240,23 @@ const WorkCarousel: React.FC = () => {
                       rel="noopener noreferrer"
                       className="wc-details-btn"
                     >
-                      DETAILS
+                      <span className="wc-btn-text">Details</span>
+                      <svg
+                        className="wc-btn-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9 18L15 12L9 6"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                     </a>
                   </div>
                 </div>
@@ -504,14 +520,13 @@ const WorkCarousel: React.FC = () => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 16px;
+          gap: 16px; /* Slightly increased gap for spacious balance */
           opacity: 0;
           transform: scale(0.94);
           transition:
             opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
             transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
           pointer-events: none;
-          mix-blend-mode: difference;
         }
 
         .wc-info-visible {
@@ -520,51 +535,76 @@ const WorkCarousel: React.FC = () => {
           pointer-events: auto;
         }
 
-        /* Project name — large, heavy, fills the card center */
+        /* Project name — large, heavy */
         .wc-project-name {
           font-size: clamp(1.6rem, 4vw, 2.6rem);
           font-weight: 900;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
+          letter-spacing: -0.02em; /* Tight letter spacing for bold titles */
           color: #ffffff;
-          line-height: 1;
+          line-height: 1.1;
           text-align: center;
           user-select: none;
+          /* Removed text-shadow for a clean flat design */
         }
 
-        /* Details button — thin, quiet, contrasts the heavy name */
+        /* Details button — Apple-inspired text link style with pop up and fade in reveal */
         .wc-details-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 9px 32px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.45);
+          gap: 6px;
+          padding: 8px 0; /* Clear vertical touch area, no block background padding */
+          border: none;
           background: transparent;
-          color: rgba(255, 255, 255, 0.85);
-          font-size: 0.62rem;
-          font-weight: 300;
-          letter-spacing: 0.32em;
-          text-transform: uppercase;
+          color: #ffffff; /* Keep the link text white */
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          font-size: 0.95rem; /* Clean text link readability */
+          font-weight: 500;
+          line-height: 1.2;
+          letter-spacing: -0.03em; /* Tight letter spacing */
+          text-transform: none;
           text-decoration: none;
           cursor: pointer;
-          mix-blend-mode: normal;
+          
+          /* Initial state for revealing animation */
+          opacity: 0;
+          transform: translateY(16px);
+          
+          /* Transition for entrance reveal and hover */
           transition:
-            color 0.3s ease,
-            background 0.3s ease,
-            border-color 0.3s ease,
-            transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+            color 0.2s ease;
+        }
+
+        /* Reveal animation triggered when parent is visible */
+        .wc-info-visible .wc-details-btn {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 0.15s; /* Smooth pop up stagger delay */
+        }
+
+        .wc-btn-icon {
+          display: inline-block;
+          margin-left: 2px;
+          opacity: 0.8;
+          color: #ffffff;
+          transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
         }
 
         .wc-details-btn:hover {
           color: #ffffff;
-          background: rgba(255, 255, 255, 0.15);
-          border-color: rgba(255, 255, 255, 0.6);
-          transform: scale(1.06);
+          opacity: 1;
+        }
+
+        .wc-details-btn:hover .wc-btn-icon {
+          opacity: 1;
+          transform: translateX(4px); /* Apple-style clean slide chevron on hover */
         }
 
         .wc-details-btn:active {
-          transform: scale(0.95);
+          opacity: 0.6;
         }
 
         /* ─── NAVIGATION ARROWS ─── */
@@ -665,8 +705,8 @@ const WorkCarousel: React.FC = () => {
             font-size: 1.1rem;
           }
           .wc-details-btn {
-            padding: 7px 24px;
-            font-size: 0.55rem;
+            padding: 6px 0;
+            font-size: 0.85rem;
           }
           .wc-nav {
             margin-top: 30px;
