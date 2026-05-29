@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import WelcomeSequence from "@/components/WelcomeSequence";
 import SectionReveal from "@/components/SectionReveal";
-import WorksStacked from "@/components/WorksStacked";
+import WorkCarousel from "@/components/WorkCarousel";
 import SkillsSection from "@/components/SkillsSection";
 import SmoothScroll from "@/components/SmoothScroll";
 import HobbiesSection from "@/components/HobbiesSection";
@@ -36,7 +36,7 @@ export default function Home() {
 
         <HobbiesSection />
 
-        <WorksStacked />
+        <WorkCarousel />
 
         <AboutMeSection />
 
