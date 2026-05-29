@@ -520,7 +520,7 @@ const WorkCarousel: React.FC = () => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 16px; /* Slightly increased gap for spacious balance */
+          gap: 4px; /* Reduced gap between project title and details */
           opacity: 0;
           transform: scale(0.94);
           transition:
@@ -557,7 +557,7 @@ const WorkCarousel: React.FC = () => {
           padding: 8px 0; /* Clear vertical touch area, no block background padding */
           border: none;
           background: transparent;
-          color: #ffffff; /* Keep the link text white */
+          color: #000000; /* Keep the link text black */
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           font-size: 0.95rem; /* Clean text link readability */
           font-weight: 500;
@@ -589,12 +589,12 @@ const WorkCarousel: React.FC = () => {
           display: inline-block;
           margin-left: 2px;
           opacity: 0.8;
-          color: #ffffff;
+          color: #000000;
           transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
         }
 
         .wc-details-btn:hover {
-          color: #ffffff;
+          color: #000000;
           opacity: 1;
         }
 
@@ -699,7 +699,7 @@ const WorkCarousel: React.FC = () => {
             font-size: clamp(3rem, 18vw, 5.5rem);
           }
           .wc-card-info {
-            gap: 10px;
+            gap: 2px;
           }
           .wc-project-name {
             font-size: 1.1rem;
