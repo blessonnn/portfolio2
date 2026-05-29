@@ -58,11 +58,14 @@ function getCollapsedStyle(index: number): React.CSSProperties {
 /** After unfold — full 3D carousel positions */
 function getCardStyle(offset: number): React.CSSProperties {
   const absOff = Math.abs(offset);
-  const rotateY = offset * 35;
-  const translateX = offset * 260;
-  const translateZ = -absOff * 200;
-  const scale = Math.max(1 - absOff * 0.18, 0.55);
-  const opacity = Math.max(1 - absOff * 0.4, 0.12);
+  const isBackCard = absOff === 2; // For 4-card carousel, offset 2 / -2 represents the card exactly behind the active card
+
+  const rotateY = isBackCard ? 0 : offset * 35;
+  const translateX = isBackCard ? 0 : offset * 260;
+  const translateZ = isBackCard ? -350 : -absOff * 200;
+  const scale = isBackCard ? 0.6 : Math.max(1 - absOff * 0.18, 0.55);
+  // Hide the back card (opacity = 0) so it doesn't break the layout symmetry and transitions smoothly
+  const opacity = isBackCard ? 0 : Math.max(1 - absOff * 0.4, 0.12);
   const zIndex = 10 - absOff;
 
   return {
@@ -611,7 +614,7 @@ const WorkCarousel: React.FC = () => {
         .wc-nav {
           position: relative;
           z-index: 8;
-          margin-top: 44px;
+          margin-top: 72px; /* Added gap between carousel and navigation buttons */
           display: flex;
           gap: 14px;
           justify-content: center;
@@ -709,7 +712,7 @@ const WorkCarousel: React.FC = () => {
             font-size: 0.85rem;
           }
           .wc-nav {
-            margin-top: 30px;
+            margin-top: 48px; /* Increased gap on mobile */
           }
           .wc-nav-btn {
             width: 42px;
