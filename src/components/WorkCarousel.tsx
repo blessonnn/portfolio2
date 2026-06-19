@@ -233,6 +233,7 @@ const WorkCarousel: React.FC = () => {
                     loading="lazy"
                   />
                   <div className="wc-card-shine" />
+                  <div className="wc-card-bottom-blur" />
 
                   {/* Name + DETAILS overlay — centered on image */}
                   <div className={`wc-card-info ${isActive && !isTransitioning ? "wc-info-visible" : ""}`}>
@@ -512,6 +513,21 @@ const WorkCarousel: React.FC = () => {
           );
           pointer-events: none;
           z-index: 2;
+        }
+
+        .wc-card-bottom-blur {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 35%;
+          pointer-events: none;
+          z-index: 3;
+          background: linear-gradient(to top, rgba(10, 10, 10, 0.7) 0%, transparent 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          mask-image: linear-gradient(to top, black 25%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to top, black 25%, transparent 100%);
         }
 
         /* ─── PROJECT NAME + DETAILS (centered overlay on image) ─── */
