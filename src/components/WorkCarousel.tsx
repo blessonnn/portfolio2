@@ -48,30 +48,24 @@ function wrapOffset(index: number, active: number, total: number): number {
 /** When collapsed (pre-unfold) all cards stack at center */
 function getCollapsedStyle(index: number): React.CSSProperties {
   return {
-    transform: `translateX(0px) translateZ(${-index * 8}px) rotateY(0deg) scale(${1 - index * 0.02})`,
-    opacity: 1 - index * 0.1,
-    zIndex: 10 - index,
+    ["--card-offset" as any]: index,
+    ["--abs-offset" as any]: Math.abs(index),
+    opacity: 0,
+    zIndex: 1,
     pointerEvents: "none" as const,
   };
 }
 
-/** After unfold — full 3D carousel positions */
+/** After unfold — 2D carousel positions */
 function getCardStyle(offset: number): React.CSSProperties {
   const absOff = Math.abs(offset);
-  const isBackCard = absOff === 2; // For 4-card carousel, offset 2 / -2 represents the card exactly behind the active card
-
-  const rotateY = isBackCard ? 0 : offset * 35;
-  const translateX = isBackCard ? 0 : offset * 260;
-  const translateZ = isBackCard ? -350 : -absOff * 200;
-  const scale = isBackCard ? 0.6 : Math.max(1 - absOff * 0.18, 0.55);
-  // Hide the back card (opacity = 0) so it doesn't break the layout symmetry and transitions smoothly
-  const opacity = isBackCard ? 0 : Math.max(1 - absOff * 0.4, 0.12);
-  const zIndex = 10 - absOff;
+  const isBackCard = absOff === 2; // Hide the card exactly behind the active card in a 4-card set
 
   return {
-    transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-    opacity,
-    zIndex,
+    ["--card-offset" as any]: offset,
+    ["--abs-offset" as any]: absOff,
+    opacity: isBackCard ? 0 : 1,
+    zIndex: offset === 0 ? 10 : 5,
     pointerEvents: offset === 0 ? ("auto" as const) : ("none" as const),
   };
 }
@@ -172,6 +166,22 @@ const WorkCarousel: React.FC = () => {
       id="work"
       className="work-carousel-container"
     >
+      {/* ── Background Vertical Grid Lines ── */}
+      <div className="wc-grid-lines" aria-hidden="true">
+        <div className="wc-grid-line" />
+        <div className="wc-grid-line" />
+        <div className="wc-grid-line" />
+        <div className="wc-grid-line" />
+        <div className="wc-grid-line" />
+      </div>
+
+      {/* ── Background Horizontal Grid Lines ── */}
+      <div className="wc-horizontal-lines" aria-hidden="true">
+        <div className="wc-horizontal-line" />
+        <div className="wc-horizontal-line" />
+        <div className="wc-horizontal-line" />
+      </div>
+
       {/* ── "WORKS" Section Heading ── */}
       <h2 className={`wc-section-heading ${inView ? "wc-heading-visible" : ""}`}>
         {"WORKS".split("").map((char, i) => (
@@ -203,18 +213,15 @@ const WorkCarousel: React.FC = () => {
         </span>
       </div>
 
-      {/* ── 3D Carousel Stage ── */}
+      {/* ── Carousel Stage ── */}
       <div className={`wc-stage ${inView ? "wc-stage-entered" : ""}`}>
         <div className="wc-track">
           {PROJECTS.map((project, i) => {
             const offset = wrapOffset(i, activeIndex, TOTAL);
 
-            // Before unfold: all stacked at center. After: full 3D spread.
             const style = hasUnfolded
               ? getCardStyle(offset)
               : getCollapsedStyle(i);
-
-            const isActive = offset === 0 && hasUnfolded;
 
             return (
               <div
@@ -234,64 +241,64 @@ const WorkCarousel: React.FC = () => {
                   />
                   <div className="wc-card-shine" />
                   <div className="wc-card-bottom-blur" />
+                </div>
 
-                  {/* Name + DETAILS overlay — centered on image */}
-                  <div className={`wc-card-info ${isActive && !isTransitioning ? "wc-info-visible" : ""}`}>
-                    <h3 className="wc-project-name">{project.title}</h3>
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="wc-details-btn"
+                {/* Info below the card */}
+                <div className="wc-card-info-below">
+                  <h3 className="wc-project-name-below">{project.title}</h3>
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="wc-details-btn-below"
+                  >
+                    <span className="wc-btn-text-below">Details</span>
+                    <svg
+                      className="wc-btn-icon-below"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <span className="wc-btn-text">Details</span>
-                      <svg
-                        className="wc-btn-icon"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M9 18L15 12L9 6"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </a>
-                  </div>
+                      <path
+                        d="M9 18L15 12L9 6"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </a>
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
 
-      {/* ── Navigation Arrows ── */}
-      <div className={`wc-nav ${hasUnfolded ? "wc-nav-visible" : ""}`}>
-        <button
-          className="wc-nav-btn"
-          onClick={() => navigate("prev")}
-          aria-label="Previous project"
-          disabled={isTransitioning || !hasUnfolded}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <button
-          className="wc-nav-btn"
-          onClick={() => navigate("next")}
-          aria-label="Next project"
-          disabled={isTransitioning || !hasUnfolded}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 6 15 12 9 18" />
-          </svg>
-        </button>
+        {/* ── Navigation Arrows (Overlaying the sides of the stage) ── */}
+        <div className={`wc-nav ${hasUnfolded ? "wc-nav-visible" : ""}`}>
+          <button
+            className="wc-nav-btn"
+            onClick={() => navigate("prev")}
+            aria-label="Previous project"
+            disabled={isTransitioning || !hasUnfolded}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            className="wc-nav-btn"
+            onClick={() => navigate("next")}
+            aria-label="Next project"
+            disabled={isTransitioning || !hasUnfolded}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 6 15 12 9 18" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* ══════════════════════════════════════════════
@@ -309,10 +316,10 @@ const WorkCarousel: React.FC = () => {
           width: 100%;
           min-height: 100vh;
           padding: 80px 20px 60px;
-          background: #0a0a0a;
+          background: #0a0a0a; /* Black background */
           overflow: hidden;
           font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-          color: #ffffff;
+          color: #ffffff; /* White text */
           box-sizing: border-box;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
@@ -325,6 +332,63 @@ const WorkCarousel: React.FC = () => {
           padding: 0;
         }
 
+        /* ─── BACKGROUND VERTICAL GRID LINES ─── */
+        .wc-grid-lines {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          display: flex;
+          justify-content: space-between;
+          pointer-events: none;
+          padding: 0 8%;
+        }
+
+        .wc-grid-line {
+          width: 1px;
+          height: 100%;
+          background: linear-gradient(
+            to bottom,
+            transparent,
+            rgba(255, 255, 255, 0.06) 15%,
+            rgba(255, 255, 255, 0.06) 85%,
+            transparent
+          );
+        }
+
+        /* ─── BACKGROUND HORIZONTAL GRID LINES ─── */
+        .wc-horizontal-lines {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          pointer-events: none;
+          padding: 12% 0;
+        }
+
+        .wc-horizontal-line {
+          width: 100%;
+          height: 1px;
+          background: linear-gradient(
+            to right,
+            transparent,
+            rgba(255, 255, 255, 0.06) 15%,
+            rgba(255, 255, 255, 0.06) 85%,
+            transparent
+          );
+        }
+
         /* ─── "WORKS" HEADING ─── */
         .wc-section-heading {
           position: relative;
@@ -335,7 +399,7 @@ const WorkCarousel: React.FC = () => {
           font-weight: 900;
           letter-spacing: -0.03em;
           line-height: 1;
-          color: #ffffff;
+          color: #ffffff; /* White heading */
           margin-bottom: 50px;
           text-transform: uppercase;
           user-select: none;
@@ -355,7 +419,7 @@ const WorkCarousel: React.FC = () => {
           opacity: 1;
         }
 
-        /* ─── BACKGROUND TITLE (behind carousel) ─── */
+        /* ─── BACKGROUND TITLE ─── */
         .wc-title-layer {
           position: absolute;
           top: 50%;
@@ -376,7 +440,7 @@ const WorkCarousel: React.FC = () => {
           text-transform: uppercase;
           letter-spacing: -0.04em;
           line-height: 1;
-          color: rgba(255, 255, 255, 0.04);
+          color: rgba(255, 255, 255, 0.04); /* Light grey title in background */
           white-space: nowrap;
           position: absolute;
           user-select: none;
@@ -420,16 +484,15 @@ const WorkCarousel: React.FC = () => {
           100% { opacity: 0; transform: translateX(100px) scale(0.94); }
         }
 
-        /* ─── 3D STAGE ─── */
+        /* ─── CAROUSEL STAGE ─── */
         .wc-stage {
           position: relative;
           z-index: 5;
           width: 100%;
+          max-width: 1300px;
           display: flex;
           align-items: center;
           justify-content: center;
-          perspective: 1400px;
-          perspective-origin: center center;
           /* Entry: slide up + fade in */
           opacity: 0;
           transform: translateY(60px);
@@ -443,23 +506,22 @@ const WorkCarousel: React.FC = () => {
           transform: translateY(0);
         }
 
-        /* Track — sized for 3:4 ratio cards */
+        /* Track — sized for 3:4 ratio cards + labels below */
         .wc-track {
           position: relative;
           width: 240px;
-          height: 320px;
-          transform-style: preserve-3d;
+          height: 380px;
         }
         @media (min-width: 640px) {
           .wc-track {
             width: 300px;
-            height: 400px;
+            height: 460px;
           }
         }
         @media (min-width: 1024px) {
           .wc-track {
             width: 340px;
-            height: 454px;
+            height: 530px;
           }
         }
 
@@ -473,18 +535,30 @@ const WorkCarousel: React.FC = () => {
           flex-direction: column;
           align-items: center;
           will-change: transform, opacity;
+
+          /* Responsive translation based on CSS variables calculated in getCardStyle */
+          transform: translateX(calc(var(--card-offset) * 260px)) scale(calc(1 - var(--abs-offset) * 0.08));
+          opacity: calc(1 - var(--abs-offset) * 0.35);
+          transition:
+            transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+            opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (min-width: 640px) {
+          .wc-card {
+            transform: translateX(calc(var(--card-offset) * 320px)) scale(calc(1 - var(--abs-offset) * 0.08));
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .wc-card {
+            transform: translateX(calc(var(--card-offset) * 380px)) scale(calc(1 - var(--abs-offset) * 0.08));
+          }
         }
 
         .wc-card-collapsed {
-          transition:
-            transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
-            opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .wc-card-unfolded {
-          transition:
-            transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+          opacity: 0;
+          transform: translateX(0px) scale(0.9);
         }
 
         /* 3:4 ratio image container */
@@ -492,11 +566,11 @@ const WorkCarousel: React.FC = () => {
           position: relative;
           width: 100%;
           aspect-ratio: 3 / 4;
-          border-radius: 14px;
+          border-radius: 20px; /* Rounded corners like the wireframe */
           overflow: hidden;
           box-shadow:
             0 24px 64px rgba(0, 0, 0, 0.6),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
+            0 0 0 1px rgba(255, 255, 255, 0.08); /* Thin border outline */
           background: #111;
           flex-shrink: 0;
         }
@@ -515,6 +589,7 @@ const WorkCarousel: React.FC = () => {
           z-index: 2;
         }
 
+        /* Pure progressive blur on bottom edge of image */
         .wc-card-bottom-blur {
           position: absolute;
           bottom: 0;
@@ -530,121 +605,81 @@ const WorkCarousel: React.FC = () => {
           -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
         }
 
-        /* ─── PROJECT NAME + DETAILS (centered overlay on image) ─── */
-        .wc-card-info {
-          position: absolute;
-          inset: 0;
-          z-index: 5;
+        /* ─── INFO BLOCK BELOW CARD ─── */
+        .wc-card-info-below {
+          margin-top: 20px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 4px; /* Reduced gap between project title and details */
-          opacity: 0;
-          transform: scale(0.94);
-          transition:
-            opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
-            transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-          pointer-events: none;
+          gap: 4px;
+          text-align: center;
+          width: 100%;
         }
 
-        .wc-info-visible {
-          opacity: 1;
-          transform: scale(1);
-          pointer-events: auto;
-        }
-
-        /* Project name — large, heavy */
-        .wc-project-name {
-          font-size: clamp(1.6rem, 4vw, 2.6rem);
+        /* Project name — bold, white */
+        .wc-project-name-below {
+          font-size: clamp(1.2rem, 3vw, 1.8rem);
           font-weight: 900;
           text-transform: uppercase;
-          letter-spacing: -0.02em; /* Tight letter spacing for bold titles */
-          color: #000000;
-          line-height: 1.1;
-          text-align: center;
+          letter-spacing: -0.02em;
+          color: #ffffff; /* White text */
+          line-height: 1.2;
           user-select: none;
-          /* Removed text-shadow for a clean flat design */
         }
 
-        /* Details button — Apple-inspired text link style with pop up and fade in reveal */
-        .wc-details-btn {
+        /* Details button — blue action link */
+        .wc-details-btn-below {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 8px 0; /* Clear vertical touch area, no block background padding */
-          border: none;
-          background: transparent;
-          color: #000000; /* Keep the link text black */
+          gap: 4px;
+          color: #3874ff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          font-size: 0.95rem; /* Clean text link readability */
-          font-weight: 500;
-          line-height: 1.2;
-          letter-spacing: -0.03em; /* Tight letter spacing */
-          text-transform: none;
+          font-size: 0.9rem;
+          font-weight: 600;
           text-decoration: none;
           cursor: pointer;
-          
-          /* Initial state for revealing animation */
-          opacity: 0;
-          transform: translateY(16px);
-          
-          /* Transition for entrance reveal and hover */
-          transition:
-            opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-            color 0.2s ease;
+          transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        /* Reveal animation triggered when parent is visible */
-        .wc-info-visible .wc-details-btn {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 0.15s; /* Smooth pop up stagger delay */
-        }
-
-        .wc-btn-icon {
-          display: inline-block;
-          margin-left: 2px;
+        .wc-details-btn-below:hover {
+          transform: translateY(-1px);
           opacity: 0.8;
-          color: #000000;
-          transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
         }
 
-        .wc-details-btn:hover {
-          color: #000000;
-          opacity: 1;
+        .wc-btn-icon-below {
+          display: inline-block;
+          transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .wc-details-btn:hover .wc-btn-icon {
-          opacity: 1;
-          transform: translateX(4px); /* Apple-style clean slide chevron on hover */
+        .wc-details-btn-below:hover .wc-btn-icon-below {
+          transform: translateX(4px);
         }
 
-        .wc-details-btn:active {
+        .wc-details-btn-below:active {
           opacity: 0.6;
         }
 
         /* ─── NAVIGATION ARROWS ─── */
         .wc-nav {
-          position: relative;
-          z-index: 8;
-          margin-top: 72px; /* Added gap between carousel and navigation buttons */
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          transform: translateY(-50%);
+          z-index: 20;
           display: flex;
-          gap: 14px;
-          justify-content: center;
-          align-items: center;
+          justify-content: space-between;
+          padding: 0 4%;
+          pointer-events: none;
+          width: 100%;
           opacity: 0;
-          transform: translateY(16px);
-          transition:
-            opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
-            transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: opacity 0.6s ease;
         }
 
         .wc-nav-visible {
           opacity: 1;
-          transform: translateY(0);
           transition-delay: 0.3s;
         }
 
@@ -652,24 +687,24 @@ const WorkCarousel: React.FC = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 48px;
-          height: 48px;
+          width: 54px;
+          height: 54px;
           border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.13);
-          background: rgba(255, 255, 255, 0.02);
-          color: rgba(255, 255, 255, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.15); /* Circular button with border */
+          background: rgba(255, 255, 255, 0.05); /* Transparent black bg */
+          color: #ffffff; /* White icon */
           cursor: pointer;
+          pointer-events: auto;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
           transition:
             background 0.35s ease,
             border-color 0.35s ease,
-            color 0.35s ease,
             transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .wc-nav-btn:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.3);
-          color: #ffffff;
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.35);
           transform: scale(1.1);
         }
 
@@ -695,7 +730,7 @@ const WorkCarousel: React.FC = () => {
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            rgba(255, 255, 255, 0.025) 0%,
+            rgba(255, 255, 255, 0.02) 0%,
             transparent 70%
           );
           top: 55%;
@@ -717,22 +752,12 @@ const WorkCarousel: React.FC = () => {
           .wc-bg-title {
             font-size: clamp(3rem, 18vw, 5.5rem);
           }
-          .wc-card-info {
-            gap: 2px;
-          }
-          .wc-project-name {
-            font-size: 1.1rem;
-          }
-          .wc-details-btn {
-            padding: 6px 0;
-            font-size: 0.85rem;
-          }
           .wc-nav {
-            margin-top: 48px; /* Increased gap on mobile */
+            padding: 0 2%;
           }
           .wc-nav-btn {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
           }
         }
       `}</style>
