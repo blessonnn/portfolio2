@@ -59,7 +59,7 @@ export default function Hero() {
       scrollTrigger: {
         trigger: wrapper,
         start: "top top",
-        end: "+=200%", // Pin for exactly 200vh of scroll
+        end: "+=450%", // Pin for exactly 450vh of scroll
         pin: true,
         pinSpacing: false, // Prevents GSAP from adding padding so the manual spacer works
         scrub: 1,
@@ -118,6 +118,16 @@ export default function Hero() {
       tl.to(leftTextRef.current, { x: "15vw", ease: "none", duration: 1.0 }, 1.0)
         .to(rightTextRef.current, { x: "-15vw", ease: "none", duration: 1.0 }, 1.0);
     }
+
+    // Fade out Hero text layers during the transition into the Welcome sequence
+    if (leftTextRef.current && rightTextRef.current && bottomTextRef.current) {
+      tl.to(leftTextRef.current, { opacity: 0, duration: 0.8 }, 1.0)
+        .to(rightTextRef.current, { opacity: 0, duration: 0.8 }, 1.0)
+        .to(bottomTextRef.current, { opacity: 0, duration: 0.8 }, 1.0);
+    }
+
+    // Extend timeline to 4.5s to match end: "+=450%" scroll pinning
+    tl.to({}, { duration: 2.5 }, 2.0);
 
   }, { scope: wrapperRef });
 

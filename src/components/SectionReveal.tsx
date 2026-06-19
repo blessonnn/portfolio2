@@ -125,7 +125,7 @@ export default function SectionReveal({
     <section 
       id={id}
       ref={sectionRef} 
-      className={`relative z-10 py-32 ${fullWidth ? 'w-full' : 'px-6 md:px-12 max-w-7xl mx-auto'}`}
+      className={`relative z-10 py-32 bg-[#0a0a0a] ${fullWidth ? 'w-full' : 'px-6 md:px-12 max-w-7xl mx-auto'}`}
     >
       <h2
         ref={titleRef}

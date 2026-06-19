@@ -520,14 +520,14 @@ const WorkCarousel: React.FC = () => {
           bottom: 0;
           left: 0;
           right: 0;
-          height: 35%;
+          height: 40%;
           pointer-events: none;
           z-index: 3;
-          background: linear-gradient(to top, rgba(10, 10, 10, 0.7) 0%, transparent 100%);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          mask-image: linear-gradient(to top, black 25%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to top, black 25%, transparent 100%);
+          background: transparent;
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          mask-image: linear-gradient(to top, black 0%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
         }
 
         /* ─── PROJECT NAME + DETAILS (centered overlay on image) ─── */
