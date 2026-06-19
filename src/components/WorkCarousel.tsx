@@ -66,7 +66,7 @@ function getCardStyle(offset: number, isWrapping: boolean): React.CSSProperties 
     ["--abs-offset" as any]: absOff,
     opacity: isBackCard ? 0 : 1,
     zIndex: offset === 0 ? 10 : 5,
-    pointerEvents: offset === 0 ? ("auto" as const) : ("none" as const),
+    pointerEvents: isBackCard ? ("none" as const) : ("auto" as const),
     transition: isWrapping ? "none" : undefined,
   };
 }
@@ -650,13 +650,13 @@ const WorkCarousel: React.FC = () => {
           user-select: none;
         }
 
-        /* Details button — blue action link */
+        /* Details button — white action link */
         .wc-details-btn-below {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 4px;
-          color: #3874ff;
+          color: #ffffff;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           font-size: 0.9rem;
           font-weight: 600;
