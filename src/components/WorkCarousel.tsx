@@ -57,7 +57,7 @@ function getCollapsedStyle(index: number): React.CSSProperties {
 }
 
 /** After unfold — 2D carousel positions */
-function getCardStyle(offset: number): React.CSSProperties {
+function getCardStyle(offset: number, isWrapping: boolean): React.CSSProperties {
   const absOff = Math.abs(offset);
   const isBackCard = absOff === 2; // Hide the card exactly behind the active card in a 4-card set
 
@@ -67,6 +67,7 @@ function getCardStyle(offset: number): React.CSSProperties {
     opacity: isBackCard ? 0 : 1,
     zIndex: offset === 0 ? 10 : 5,
     pointerEvents: offset === 0 ? ("auto" as const) : ("none" as const),
+    transition: isWrapping ? "none" : undefined,
   };
 }
 
@@ -218,9 +219,11 @@ const WorkCarousel: React.FC = () => {
         <div className="wc-track">
           {PROJECTS.map((project, i) => {
             const offset = wrapOffset(i, activeIndex, TOTAL);
+            const prevOffset = wrapOffset(i, prevIndex, TOTAL);
+            const isWrapping = isTransitioning && Math.abs(offset - prevOffset) > 1;
 
             const style = hasUnfolded
-              ? getCardStyle(offset)
+              ? getCardStyle(offset, isWrapping)
               : getCollapsedStyle(i);
 
             return (
@@ -573,6 +576,25 @@ const WorkCarousel: React.FC = () => {
             0 0 0 1px rgba(255, 255, 255, 0.08); /* Thin border outline */
           background: #111;
           flex-shrink: 0;
+          transition:
+            transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+            box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Image hover translate/zoom effect */
+        .wc-card:hover .wc-card-inner {
+          transform: translateY(-12px);
+          box-shadow:
+            0 32px 80px rgba(0, 0, 0, 0.8),
+            0 0 0 1.5px rgba(255, 255, 255, 0.15);
+        }
+
+        .wc-card-inner :global(img) {
+          transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+
+        .wc-card:hover .wc-card-inner :global(img) {
+          transform: scale(1.05);
         }
 
         .wc-card-shine {
