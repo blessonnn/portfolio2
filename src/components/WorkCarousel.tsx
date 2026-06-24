@@ -232,47 +232,31 @@ const WorkCarousel: React.FC = () => {
                 className={`wc-card ${hasUnfolded ? "wc-card-unfolded" : "wc-card-collapsed"}`}
                 style={style}
               >
-                {/* Card image — 3:4 ratio container */}
-                <div className="wc-card-inner">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 60vw, 320px"
-                    style={{ objectFit: "cover" }}
-                    loading="lazy"
-                  />
-                  <div className="wc-card-shine" />
-                  <div className="wc-card-bottom-blur" />
-                </div>
+                {/* Card image — 3:4 ratio container wrapped with details cursor link */}
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="wc-card-link"
+                  data-cursor="details"
+                >
+                  <div className="wc-card-inner">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 60vw, 320px"
+                      style={{ objectFit: "cover" }}
+                      loading="lazy"
+                    />
+                    <div className="wc-card-shine" />
+                    <div className="wc-card-bottom-blur" />
+                  </div>
+                </a>
 
                 {/* Info below the card */}
                 <div className="wc-card-info-below">
                   <h3 className="wc-project-name-below">{project.title}</h3>
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="wc-details-btn-below"
-                  >
-                    <span className="wc-btn-text-below">Details</span>
-                    <svg
-                      className="wc-btn-icon-below"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M9 18L15 12L9 6"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
                 </div>
               </div>
             );
@@ -562,6 +546,13 @@ const WorkCarousel: React.FC = () => {
         .wc-card-collapsed {
           opacity: 0;
           transform: translateX(0px) scale(0.9);
+        }
+
+        .wc-card-link {
+          display: block;
+          width: 100%;
+          text-decoration: none;
+          cursor: none !important;
         }
 
         /* 3:4 ratio image container */
