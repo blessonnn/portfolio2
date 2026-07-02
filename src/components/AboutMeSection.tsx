@@ -5,6 +5,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import MagnetLines from "./core/MagnetLines";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -110,6 +111,19 @@ export default function AboutMeSection() {
 
   return (
     <section ref={sectionRef} id="about" className="relative py-24 px-6 md:px-12 bg-white flex items-center justify-start min-h-screen overflow-hidden">
+
+      {/* Background Magnet Lines Animation */}
+      <div className="absolute inset-0 pointer-events-none z-0 opacity-30 flex items-center justify-center overflow-hidden">
+        <MagnetLines
+          rows={12}
+          columns={18}
+          containerSize="100%"
+          lineColor="#3874FF"
+          lineWidth="0.4vmin"
+          lineHeight="3.5vmin"
+          baseAngle={0}
+        />
+      </div>
 
       {/* Large Background Text Roll */}
       <div
