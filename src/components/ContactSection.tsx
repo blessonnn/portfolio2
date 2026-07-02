@@ -112,13 +112,13 @@ export default function ContactSection() {
 
         <div className="relative z-10 flex flex-col mb-16 w-full">
           <div className="flex flex-col md:flex-row justify-between md:items-end w-full gap-8">
-            <div className="relative w-full max-w-[800px] h-[22vw] min-h-[120px] md:min-h-[220px] overflow-hidden select-none">
+            <div className="relative w-full max-w-[800px] h-[16vw] min-h-[90px] md:min-h-[160px] overflow-hidden select-none">
               <ASCIIText
                 text="Blesson"
                 enableWaves={false}
                 asciiFontSize={8}
                 textColor="#ffffff"
-                planeBaseHeight={15}
+                planeBaseHeight={11}
               />
             </div>
             
@@ -136,7 +136,7 @@ export default function ContactSection() {
             </div>
           </div>
           <p 
-            className="text-white text-2xl md:text-5xl font-medium mt-6 tracking-tight flex overflow-hidden" 
+            className="text-white text-2xl md:text-5xl font-medium mt-2 tracking-tight flex overflow-hidden" 
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
             {"let's connect".split("").map((char, index) => (
