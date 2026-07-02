@@ -5,6 +5,8 @@ import { Mail } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import FaultyTerminal from "./core/FaultyTerminal";
+import ASCIIText from "./core/ASCIIText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,16 +68,6 @@ export default function ContactSection() {
     });
 
     tl.fromTo(
-      ".blesson-char",
-      { y: "120%", opacity: 0 },
-      {
-        y: "0%",
-        opacity: 1,
-        duration: 1.2,
-        stagger: 0.1,
-        ease: "power4.out",
-      }
-    ).fromTo(
       ".connect-char",
       { y: "120%", opacity: 0 },
       {
@@ -84,42 +76,67 @@ export default function ContactSection() {
         duration: 1.2,
         stagger: 0.05,
         ease: "power4.out",
-      },
-      "-=0.8"
+      }
     );
   }, { scope: sectionRef });
 
   return (
     <div className="bg-white w-full">
-      <section ref={sectionRef} id="contact" className="w-full bg-[#3874FF] pt-24 pb-12 px-6 md:px-12 flex flex-col justify-between min-h-[60vh] rounded-t-[2rem]">
-        <div className="flex flex-col mb-16 w-full">
+      <section
+        ref={sectionRef}
+        id="contact"
+        className="relative w-full bg-[#0a0a0a] pt-24 pb-12 px-6 md:px-12 flex flex-col justify-between min-h-[60vh] rounded-t-[2rem] overflow-hidden"
+      >
+        {/* FaultyTerminal shader background */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <FaultyTerminal
+            scale={1.2}
+            gridMul={[2, 1]}
+            digitSize={1.4}
+            timeScale={0.4}
+            pause={false}
+            scanlineIntensity={0.4}
+            glitchAmount={1.2}
+            flickerAmount={0.8}
+            noiseAmp={0.1}
+            chromaticAberration={1.5}
+            dither={0.1}
+            curvature={0.1}
+            tint="#3874FF"
+            mouseReact={true}
+            mouseStrength={0.4}
+            pageLoadAnimation={false}
+            brightness={0.8}
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col mb-16 w-full">
           <div className="flex flex-col md:flex-row justify-between md:items-end w-full gap-8">
-            <h1 
-              className="text-[12vw] leading-none text-black uppercase tracking-tighter flex overflow-hidden"
-              style={{ fontFamily: "'Martian Mono', monospace" }}
-            >
-              {"Blesson".split("").map((char, index) => (
-                <span key={index} className="blesson-char inline-block">
-                  {char}
-                </span>
-              ))}
-            </h1>
+            <div className="relative w-full max-w-[800px] h-[22vw] min-h-[120px] md:min-h-[220px] overflow-hidden select-none">
+              <ASCIIText
+                text="Blesson"
+                enableWaves={true}
+                asciiFontSize={8}
+                textColor="#ffffff"
+                planeBaseHeight={15}
+              />
+            </div>
             
             <div className="hidden md:flex flex-col gap-2 items-end mb-0 translate-y-2 md:translate-y-4">
               {NAV_ITEMS.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="relative text-black text-sm uppercase tracking-widest font-bold group/navlink overflow-hidden pb-1"
+                  className="relative text-white text-sm uppercase tracking-widest font-bold group/navlink overflow-hidden pb-1"
                 >
                   {item.name}
-                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-black transform scale-x-0 group-hover/navlink:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] origin-left" />
+                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#3874FF] transform scale-x-0 group-hover/navlink:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] origin-left" />
                 </a>
               ))}
             </div>
           </div>
           <p 
-            className="text-black text-2xl md:text-5xl font-medium mt-6 tracking-tight flex overflow-hidden" 
+            className="text-white text-2xl md:text-5xl font-medium mt-6 tracking-tight flex overflow-hidden" 
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
             {"let's connect".split("").map((char, index) => (
@@ -130,8 +147,8 @@ export default function ContactSection() {
           </p>
         </div>
 
-        <div className="mt-auto flex flex-col gap-6 md:gap-10">
-          <hr className="border-black/30 border-t" />
+        <div className="relative z-10 mt-auto flex flex-col gap-6 md:gap-10">
+          <hr className="border-white/20 border-t" />
           
           <div className="flex flex-wrap gap-8 md:gap-16 justify-start items-center w-full">
             {links.map((link) => (
@@ -140,7 +157,7 @@ export default function ContactSection() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center text-black font-semibold uppercase text-xl md:text-2xl tracking-wider cursor-pointer"
+                className="group flex items-center text-white font-semibold uppercase text-xl md:text-2xl tracking-wider cursor-pointer"
               >
                 <span className="overflow-hidden flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] w-0 opacity-0 -translate-x-4 group-hover:w-10 group-hover:opacity-100 group-hover:translate-x-0">
                   {link.icon}

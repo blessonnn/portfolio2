@@ -95,9 +95,9 @@ export default function AboutMeSection() {
       }
     );
 
-    // Image reveal animation
+    // Image reveal animation using clip-path for performance and to prevent Next.js image warnings
     gsap.to(".second-image", {
-      height: "100%",
+      clipPath: "inset(0% 0% 0% 0%)",
       ease: "none",
       scrollTrigger: {
         trigger: sectionRef.current,
@@ -145,15 +145,20 @@ export default function AboutMeSection() {
               src="/about-me/about-me-portfolio.jpg"
               alt="Blesson J.F"
               fill
+              sizes="(max-width: 768px) 150px, 220px"
               className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
               priority
             />
             {/* Second Image that reveals on scroll */}
-            <div className="second-image absolute top-0 left-0 w-full h-0 overflow-hidden z-20">
+            <div 
+              className="second-image absolute inset-0 w-full h-full overflow-hidden z-20" 
+              style={{ clipPath: "inset(0% 0% 100% 0%)" }}
+            >
                <Image
                 src="/about-me/childish copy.png"
                 alt="Blesson J.F Alternate"
                 fill
+                sizes="(max-width: 768px) 150px, 220px"
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
               />
             </div>

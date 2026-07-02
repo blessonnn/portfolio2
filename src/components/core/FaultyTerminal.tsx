@@ -279,6 +279,8 @@ export default function FaultyTerminal({
   const timeOffsetRef = useRef(Math.random() * 100);
 
   const tintVec = useMemo(() => hexToRgb(tint), [tint]);
+  const [tintR, tintG, tintB] = tintVec;
+  const [gridMulX, gridMulY] = gridMul;
 
   const ditherValue = useMemo(() => (typeof dither === "boolean" ? (dither ? 1 : 0) : dither), [dither]);
 
@@ -352,7 +354,13 @@ export default function FaultyTerminal({
     resizeObserver.observe(ctn);
     resize();
 
+    let isVisible = false;
+
     const update = (t: number) => {
+      if (!isVisible) {
+        rafRef.current = 0;
+        return;
+      }
       rafRef.current = requestAnimationFrame(update);
 
       if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
@@ -390,13 +398,32 @@ export default function FaultyTerminal({
 
       renderer.render({ scene: mesh });
     };
-    rafRef.current = requestAnimationFrame(update);
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          if (!rafRef.current) {
+            rafRef.current = requestAnimationFrame(update);
+          }
+        } else {
+          if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = 0;
+          }
+        }
+      },
+      { threshold: 0.01 }
+    );
+    visibilityObserver.observe(ctn);
+
     ctn.appendChild(gl.canvas);
 
     if (mouseReact) ctn.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      visibilityObserver.disconnect();
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       resizeObserver.disconnect();
       if (mouseReact) ctn.removeEventListener("mousemove", handleMouseMove);
       if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas);
@@ -409,7 +436,8 @@ export default function FaultyTerminal({
     pause,
     timeScale,
     scale,
-    gridMul,
+    gridMulX,
+    gridMulY,
     digitSize,
     scanlineIntensity,
     glitchAmount,
@@ -418,7 +446,9 @@ export default function FaultyTerminal({
     chromaticAberration,
     ditherValue,
     curvature,
-    tintVec,
+    tintR,
+    tintG,
+    tintB,
     mouseReact,
     mouseStrength,
     pageLoadAnimation,

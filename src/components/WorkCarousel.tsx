@@ -10,13 +10,13 @@ const PROJECTS = [
   {
     id: "vitalpulse",
     title: "vitalpulse",
-    image: "/works/vitalpulse.png",
+    image: "/works/Vital_dither.png",
     github: "https://github.com/blessonnn/Health_IoT_Project",
   },
   {
     id: "lastpage",
     title: "lastpage",
-    image: "/works/lastpage.png",
+    image: "/works/lastnote_dither.png",
     github: "https://github.com/blessonnn/lastpage",
   },
   {
@@ -28,7 +28,7 @@ const PROJECTS = [
   {
     id: "portfolio2",
     title: "portfolio2",
-    image: "/works/portfolio2.png",
+    image: "/works/Me_dither.png",
     github: "https://github.com/blessonnn/portfolio2",
   },
 ];
@@ -240,7 +240,7 @@ const WorkCarousel: React.FC = () => {
                   className="wc-card-link"
                   data-cursor="details"
                 >
-                  <div className="wc-card-inner">
+                  <div className="wc-card-inner" style={{ backgroundColor: (project.id === "portfolio2" || project.id === "vitalpulse" || project.id === "lastpage") ? "#ffffff" : undefined }}>
                     <Image
                       src={project.image}
                       alt={project.title}

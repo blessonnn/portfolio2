@@ -27,15 +27,15 @@ export default function WelcomeSequence() {
 
     // 1. Animate background blur on the overlay covering the hero section
     tl.fromTo(blurOverlayRef.current,
-      { backdropFilter: "blur(0px)", webkitBackdropFilter: "blur(0px)" },
-      { backdropFilter: "blur(8px)", webkitBackdropFilter: "blur(8px)", duration: 0.4, ease: "power2.out" },
+      { backdropFilter: "blur(0px)" },
+      { backdropFilter: "blur(8px)", duration: 0.4, ease: "power2.out" },
       0
     )
     .to(blurOverlayRef.current, {
       duration: 0.2 // Hold state
     })
     .to(blurOverlayRef.current,
-      { backdropFilter: "blur(0px)", webkitBackdropFilter: "blur(0px)", duration: 0.4, ease: "power2.in" },
+      { backdropFilter: "blur(0px)", duration: 0.4, ease: "power2.in" },
       0.6
     );
 
