@@ -1,50 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import PillNav from "./core/PillNav";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const NAV_ITEMS = [
-  { name: "Welcome", href: "#welcome" },
-  { name: "Skills", href: "#skills" },
-  { name: "Hobby", href: "#hobby" },
-  { name: "Works", href: "#works" },
-  { name: "About Me", href: "#about" },
-  { name: "Contact", href: "#contact" },
+  { label: "Welcome", href: "#welcome" },
+  { label: "Skills", href: "#skills" },
+  { label: "Hobby", href: "#hobby" },
+  { label: "Works", href: "#works" },
+  { label: "About Me", href: "#about" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const pillRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const navRef = useRef<HTMLDivElement>(null);
   const isUserClick = useRef(false);
-
-  // Animate the blue pill to the active item
-  const movePillTo = useCallback((index: number) => {
-    const item = itemRefs.current[index];
-    const pill = pillRef.current;
-    const nav = navRef.current;
-    if (!item || !pill || !nav) return;
-
-    const navRect = nav.getBoundingClientRect();
-    const itemRect = item.getBoundingClientRect();
-
-    const targetLeft = itemRect.left - navRect.left;
-    const targetWidth = itemRect.width;
-
-    // Subtle and smooth animation
-    gsap.to(pill, {
-      x: targetLeft,
-      width: targetWidth,
-      opacity: 1,
-      duration: 0.5,
-      ease: "power3.out",
-    });
-  }, []);
 
   // IntersectionObserver to detect active section on scroll
   useEffect(() => {
@@ -76,38 +52,11 @@ export default function Navbar() {
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
-  // Move the pill whenever activeSection changes
-  useEffect(() => {
-    if (activeSection === null) return;
-
-    const index = NAV_ITEMS.findIndex(
-      (item) => item.href.replace("#", "") === activeSection
-    );
-    if (index !== -1) {
-      movePillTo(index);
-    }
-  }, [activeSection, movePillTo]);
-
-  // Text slide-in animation on initial mount
+  // Show/Hide on scroll using GSAP ScrollTrigger
   useGSAP(() => {
-    // Stagger slide-in for nav item text
-    const items = itemRefs.current.filter(Boolean);
-    gsap.fromTo(
-      items,
-      { y: 20, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        stagger: 0.06,
-        duration: 0.5,
-        ease: "power3.out",
-        delay: 0.1,
-      }
-    );
-
-    // Show/Hide on scroll
-    const showNav = gsap.fromTo(navRef.current, 
-      { y: -100, opacity: 0 }, 
+    const showNav = gsap.fromTo(
+      navRef.current,
+      { y: -100, opacity: 0 },
       { y: 0, opacity: 1, paused: true, duration: 0.3, ease: "power2.out" }
     );
 
@@ -125,14 +74,13 @@ export default function Navbar() {
         } else {
           showNav.reverse(); // Hidden in Hero section
         }
-      }
+      },
     });
   }, { scope: navRef });
 
   const scrollToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-    index: number
+    href: string
   ) => {
     e.preventDefault();
     const sectionId = href.replace("#", "");
@@ -140,11 +88,10 @@ export default function Navbar() {
     // Set user click flag to prevent observer from overriding
     isUserClick.current = true;
     setActiveSection(sectionId);
-    movePillTo(index);
 
     const target = document.querySelector(href);
     if (target) {
-      const top = target.getBoundingClientRect().top + window.pageYOffset;
+      const top = target.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top,
         behavior: "smooth",
@@ -158,43 +105,22 @@ export default function Navbar() {
   };
 
   return (
-    <div id="navbar-container" className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
-      <nav
-        id="main-nav"
-        ref={navRef}
-        style={{ opacity: 0, transform: "translateY(-100px)" }}
-        className="flex items-center gap-1 px-2 py-1.5 bg-black/20 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl"
-      >
-        {/* Sliding blue pill indicator */}
-        <div
-          ref={pillRef}
-          className="absolute top-1.5 left-0 h-[calc(100%-12px)] rounded-full pointer-events-none z-0"
-          style={{
-            opacity: 0,
-            width: 0,
-            background: "var(--accent)",
-            filter: "blur(0.5px)",
-            boxShadow: "0 0 20px rgba(56, 116, 255, 0.4), 0 0 40px rgba(56, 116, 255, 0.15)",
-          }}
-        />
-
-        {NAV_ITEMS.map((item, i) => (
-          <a
-            key={item.name}
-            ref={(el) => { itemRefs.current[i] = el; }}
-            href={item.href}
-            onClick={(e) => scrollToSection(e, item.href, i)}
-            className={`relative z-10 nav-capsule px-4 py-2 text-xs md:text-sm font-medium rounded-full whitespace-nowrap transition-colors duration-300 ${
-              activeSection === item.href.replace("#", "")
-                ? "text-white"
-                : "text-white/50 hover:text-white/80"
-            }`}
-            style={{ opacity: 0 }}
-          >
-            {item.name}
-          </a>
-        ))}
-      </nav>
+    <div
+      id="navbar-container"
+      ref={navRef}
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-[100]"
+      style={{ opacity: 0, transform: "translateY(-100px)" }}
+    >
+      <PillNav
+        items={NAV_ITEMS}
+        activeHref={activeSection ? `#${activeSection}` : undefined}
+        onItemClick={(e, href) => scrollToSection(e, href)}
+        baseColor="#3874FF"
+        pillColor="rgba(255, 255, 255, 0.08)"
+        pillTextColor="#ffffff"
+        hoveredPillTextColor="#ffffff"
+        initialLoadAnimation={false}
+      />
     </div>
   );
 }
