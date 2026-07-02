@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { TextPressure } from "@/components/core/text-pressure";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,14 +69,22 @@ export default function WelcomeSequence() {
           <div className="relative w-full h-full flex flex-col items-center justify-center px-4 md:px-8">
             <div
               ref={textRef}
-              className="text-[#3874ff] text-[clamp(6rem,28vw,50rem)] font-black uppercase tracking-tighter select-none pointer-events-none text-center leading-none font-supertalls"
+              className="w-full select-none pointer-events-none text-center"
               style={{
-                fontFamily: "'Supertalls', sans-serif",
-                color: '#3874ff',
                 transform: "translateY(100vh)"
               }}
             >
-              Welcome
+              <TextPressure
+                text="Welcome"
+                flex={true}
+                alpha={false}
+                stroke={false}
+                width={true}
+                weight={true}
+                italic={false}
+                textColor="#3874ff"
+                minFontSize={48}
+              />
             </div>
           </div>
         </div>
