@@ -22,7 +22,7 @@ const PROJECTS = [
   {
     id: "trackie",
     title: "trackie",
-    image: "/works/trackie.png",
+    image: "/works/trackie-dither.png",
     github: "https://github.com/blessonnn/trackie",
   },
   {
@@ -240,7 +240,7 @@ const WorkCarousel: React.FC = () => {
                   className="wc-card-link"
                   data-cursor="details"
                 >
-                  <div className="wc-card-inner" style={{ backgroundColor: (project.id === "portfolio2" || project.id === "vitalpulse" || project.id === "lastpage") ? "#ffffff" : undefined }}>
+                  <div className="wc-card-inner" style={{ backgroundColor: "#ffffff" }}>
                     <Image
                       src={project.image}
                       alt={project.title}
