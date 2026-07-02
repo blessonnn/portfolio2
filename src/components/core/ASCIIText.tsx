@@ -391,6 +391,16 @@ class CanvAscii {
     }
 
     this.center = { x: w / 2, y: h / 2 };
+
+    if (this.mesh && this.textCanvas) {
+      const vFov = (this.camera.fov * Math.PI) / 180;
+      const heightAtZ0 = 2 * Math.tan(vFov / 2) * this.camera.position.z;
+      const widthAtZ0 = heightAtZ0 * this.camera.aspect;
+      const textAspect = this.textCanvas.width / this.textCanvas.height;
+      const planeW = this.planeBaseHeight * textAspect;
+      // Align to left instead of center
+      this.mesh.position.x = -widthAtZ0 / 2 + planeW / 2;
+    }
   }
 
   play() {
@@ -637,6 +647,7 @@ export default function ASCIIText({
         }
 
         .ascii-text-container pre {
+          white-space: pre !important;
           margin: 0;
           user-select: none;
           padding: 0;

@@ -38,12 +38,7 @@ export default function AboutMeSection() {
       ease: "power4.inOut"
     });
 
-    // Image slight scale up reveal
-    tl.from(imageRef.current, {
-      scale: 1.1,
-      duration: 1.5,
-      ease: "power2.out"
-    }, "<");
+
 
     // Block reveal animation for the heading lines
     const headingBlocks = gsap.utils.toArray(".about-heading-block") as HTMLElement[];
@@ -95,18 +90,6 @@ export default function AboutMeSection() {
       }
     );
 
-    // Image reveal animation using clip-path for performance and to prevent Next.js image warnings
-    gsap.to(".second-image", {
-      clipPath: "inset(0% 0% 0% 0%)",
-      ease: "none",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top bottom",
-        end: "top top",
-        scrub: true,
-      }
-    });
-
   }, { scope: sectionRef });
 
   return (
@@ -140,28 +123,14 @@ export default function AboutMeSection() {
         {/* Left Side: Image with Mask */}
         <div className="relative overflow-hidden group justify-self-start">
           <div ref={imageRef} className="relative aspect-[4/5] w-[150px] md:w-[220px] rounded-none overflow-hidden bg-gray-100">
-            {/* Base Image */}
             <Image
-              src="/about-me/about-me-portfolio.jpg"
+              src="/about-me/childish copy.png"
               alt="Blesson J.F"
               fill
               sizes="(max-width: 768px) 150px, 220px"
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+              className="object-cover"
               priority
             />
-            {/* Second Image that reveals on scroll */}
-            <div 
-              className="second-image absolute inset-0 w-full h-full overflow-hidden z-20" 
-              style={{ clipPath: "inset(0% 0% 100% 0%)" }}
-            >
-               <Image
-                src="/about-me/childish copy.png"
-                alt="Blesson J.F Alternate"
-                fill
-                sizes="(max-width: 768px) 150px, 220px"
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-              />
-            </div>
           </div>
           {/* Grey Mask (Initial reveal) */}
           <div
