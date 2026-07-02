@@ -115,7 +115,7 @@ export default function ContactSection() {
             <div className="relative w-full max-w-[800px] h-[22vw] min-h-[120px] md:min-h-[220px] overflow-hidden select-none">
               <ASCIIText
                 text="Blesson"
-                enableWaves={true}
+                enableWaves={false}
                 asciiFontSize={8}
                 textColor="#ffffff"
                 planeBaseHeight={15}
