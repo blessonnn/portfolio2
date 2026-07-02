@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import FaultyTerminal from "./core/FaultyTerminal";
 import ASCIIText from "./core/ASCIIText";
+import RotatingText from "./core/RotatingText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -67,18 +68,20 @@ export default function ContactSection() {
       }
     });
 
-    tl.fromTo(
-      ".connect-char",
-      { y: "120%", opacity: 0 },
-      {
-        y: "0%",
-        opacity: 1,
-        duration: 1.2,
-        stagger: 0.05,
-        ease: "power4.out",
-      }
-    );
   }, { scope: sectionRef });
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    if (typeof window !== "undefined" && (window as any).lenisInstance) {
+      (window as any).lenisInstance.scrollTo(href);
+    } else {
+      const target = document.querySelector(href);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }
+  };
 
   return (
     <div className="bg-white w-full">
@@ -127,6 +130,7 @@ export default function ContactSection() {
                 <a
                   key={item.name}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
                   className="relative text-white text-sm uppercase tracking-widest font-bold group/navlink overflow-hidden pb-1"
                 >
                   {item.name}
@@ -135,16 +139,23 @@ export default function ContactSection() {
               ))}
             </div>
           </div>
-          <p 
+          <div 
             className="text-white text-2xl md:text-5xl font-medium mt-2 tracking-tight flex overflow-hidden" 
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            {"let's connect".split("").map((char, index) => (
-              <span key={index} className="connect-char inline-block">
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
-          </p>
+            <RotatingText
+              texts={["Let's build", "Let's create", "Let's design", "Let's innovate", "Let's begin"]}
+              mainClassName="text-white overflow-hidden justify-start"
+              staggerFrom="last"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "-120%" }}
+              staggerDuration={0.025}
+              splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+              transition={{ type: "spring", damping: 30, stiffness: 400 }}
+              rotationInterval={2000}
+            />
+          </div>
         </div>
 
         <div className="relative z-10 mt-auto flex flex-col gap-6 md:gap-10">
