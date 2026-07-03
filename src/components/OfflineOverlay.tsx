@@ -74,7 +74,7 @@ export default function OfflineOverlay() {
                 textShadow: "0 0 30px rgba(56, 116, 255, 0.3)",
               }}
             >
-              Recconecting
+              Reconnecting
             </motion.h1>
 
             {/* Cyber-minimalist pulsing loader dots */}
