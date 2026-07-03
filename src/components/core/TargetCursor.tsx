@@ -1,4 +1,7 @@
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+"use client";
+
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import './TargetCursor.css';
 
@@ -437,7 +440,7 @@ const TargetCursor = ({
     return null;
   }
 
-  return (
+  const cursorContent = (
     <div ref={cursorRef} className="target-cursor-wrapper pointer-events-none">
       <div ref={dotRef} className="target-cursor-dot" style={{ backgroundColor: cursorColor }} />
       <div className="target-cursor-corner corner-tl" style={{ borderColor: cursorColor }} />
@@ -446,6 +449,12 @@ const TargetCursor = ({
       <div className="target-cursor-corner corner-bl" style={{ borderColor: cursorColor }} />
     </div>
   );
+
+  if (typeof window !== "undefined") {
+    return createPortal(cursorContent, document.body);
+  }
+
+  return cursorContent;
 };
 
 export default TargetCursor;

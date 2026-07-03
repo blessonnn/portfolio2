@@ -520,6 +520,7 @@ const HobbiesSection = () => {
     
     if (activeHobby !== null) {
       document.body.style.overflow = "hidden";
+      document.body.classList.add('hobbies-active');
       if (lenis && typeof lenis.stop === 'function') lenis.stop();
     } else {
       document.body.style.overflow = "";
@@ -756,7 +757,8 @@ const HobbiesSection = () => {
               return (
                 <div
                   key={hobby.id}
-                  onClick={(e) => handleHobbyClick(hobby.id, e)}
+                  onClick={(e) => handleHobbyClick(hobby.id, e)
+    }
                   className="hobby-list-item cursor-target group relative border-b border-white/20 py-3 md:py-4 cursor-pointer overflow-hidden transition-colors"
                 >
                   {/* Random color hover background */}
