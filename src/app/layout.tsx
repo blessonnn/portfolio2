@@ -4,6 +4,8 @@ import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import Preloader from "@/components/Preloader";
 import CustomScrollIndicator from "@/components/CustomScrollIndicator";
+import OfflineOverlay from "@/components/OfflineOverlay";
+
 export const metadata: Metadata = {
   title: "Blesson Portfolio",
   description: "A high-energy, cyber-minimalist portfolio",
@@ -20,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased bg-black text-white" suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <OfflineOverlay />
         <CustomScrollIndicator />
         <Preloader />
         <CustomCursor />

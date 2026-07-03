@@ -31,6 +31,12 @@ const PROJECTS = [
     image: "/works/Me_dither.png",
     github: "https://github.com/blessonnn/portfolio2",
   },
+  {
+    id: "attendly",
+    title: "Attendly",
+    image: "/works/atendly_dither.png",
+    github: "https://github.com/blessonnn/Attendly",
+  },
 ];
 
 const TOTAL = PROJECTS.length;
