@@ -55,3 +55,15 @@
   border-right: none;
   border-top: none;
 }
+
+
+.hide-cursor, .hide-cursor * {
+  cursor: none !important;
+}
+
+
+
+
+body:not(.hobbies-active) .target-cursor-wrapper {
+  display: none !important;
+}

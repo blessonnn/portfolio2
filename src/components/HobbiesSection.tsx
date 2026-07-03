@@ -534,6 +534,13 @@ const HobbiesSection = () => {
 
   useGSAP(
     () => {
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        toggleClass: { targets: "body", className: "hobbies-active" }
+      });
+
       // Create the main timeline for the scroll-triggered animation
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -723,6 +730,8 @@ const HobbiesSection = () => {
         spinDuration={2}
         hideDefaultCursor={false}
         parallaxOn={true}
+        cursorColor="#3874ff"
+        cursorColorOnTarget="#3874ff"
       />
       {/* Huge scrolling text */}
       <h2
@@ -807,7 +816,7 @@ const HobbiesSection = () => {
             <div className="w-full max-w-7xl mx-auto px-4 md:px-12 pt-8 pb-4 flex items-center justify-between z-10 shrink-0">
               <button
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCloseGrid(); }}
-                className="px-6 py-2 bg-black text-white text-xl md:text-2xl font-medium rounded-full hover:bg-black/80 transition-colors flex items-center gap-2 cursor-pointer shadow-2xl"
+                className="px-6 py-2 bg-black text-white text-xl md:text-2xl font-medium rounded-full hover:bg-black/80 transition-colors flex items-center gap-2 cursor-pointer cursor-target shadow-2xl"
               >
                 &larr; Back
               </button>

@@ -34,6 +34,7 @@ const getContainingBlockOffset = (block: HTMLElement | null) => {
 
 interface TargetCursorProps {
   targetSelector?: string;
+  containerSelector?: string;
   spinDuration?: number;
   hideDefaultCursor?: boolean;
   hoverDuration?: number;
@@ -44,6 +45,7 @@ interface TargetCursorProps {
 
 const TargetCursor = ({
   targetSelector = '.cursor-target',
+  containerSelector,
   spinDuration = 2,
   hideDefaultCursor = true,
   hoverDuration = 0.2,
@@ -94,9 +96,9 @@ const TargetCursor = ({
   useEffect(() => {
     if (isMobile || !cursorRef.current) return;
 
-    const originalCursor = document.body.style.cursor;
+
     if (hideDefaultCursor) {
-      document.body.style.cursor = 'none';
+      
     }
 
     const cursor = cursorRef.current;
@@ -228,8 +230,7 @@ const TargetCursor = ({
       }
 
       activeTarget = target;
-      document.body.style.cursor = 'none';
-      gsap.to(cursorRef.current, { opacity: 1, duration: 0.2 });
+      
       const corners = Array.from(cornersRef.current);
       corners.forEach(corner => gsap.killTweensOf(corner, 'x,y'));
 
@@ -290,8 +291,8 @@ const TargetCursor = ({
         targetCornerPositionsRef.current = null;
         gsap.set(activeStrengthRef.current, { current: 0, overwrite: true });
         activeTarget = null;
-        document.body.style.cursor = originalCursor;
-        gsap.to(cursorRef.current, { opacity: 0, duration: 0.2 });
+        
+        
 
         if (cursorColorOnTarget && cornersRef.current) {
           gsap.to(Array.from(cornersRef.current), {
@@ -362,6 +363,24 @@ const TargetCursor = ({
 
     window.addEventListener('mouseover', enterHandler, { passive: true });
 
+    
+    const overContainerHandler = (e: MouseEvent) => {
+      if (!cursorRef.current) return;
+      if (containerSelector) {
+         const el = e.target as HTMLElement;
+         if (el && el.closest(containerSelector)) {
+            gsap.to(cursorRef.current, { opacity: 1, duration: 0.2, overwrite: 'auto' });
+         } else {
+            gsap.to(cursorRef.current, { opacity: 0, duration: 0.2, overwrite: 'auto' });
+         }
+      } else {
+         gsap.to(cursorRef.current, { opacity: 1, duration: 0.2, overwrite: 'auto' });
+      }
+    };
+    window.addEventListener('mouseover', overContainerHandler, { passive: true });
+    // Run once on mount to set initial visibility based on mouse position if possible, 
+    // but opacity: 0 initially handles the default hidden state.
+
     const resizeHandler = () => {
       containingBlockRef.current = getContainingBlock(cursor);
     };
@@ -374,6 +393,7 @@ const TargetCursor = ({
 
       window.removeEventListener('mousemove', moveHandler);
       window.removeEventListener('mouseover', enterHandler);
+      window.removeEventListener('mouseover', overContainerHandler);
       window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('resize', resizeHandler);
       window.removeEventListener('mousedown', mouseDownHandler);
@@ -384,7 +404,7 @@ const TargetCursor = ({
       }
 
       spinTl.current?.kill();
-      document.body.style.cursor = originalCursor;
+
 
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
@@ -418,7 +438,7 @@ const TargetCursor = ({
   }
 
   return (
-    <div ref={cursorRef} className="target-cursor-wrapper pointer-events-none" style={{ opacity: 0 }}>
+    <div ref={cursorRef} className="target-cursor-wrapper pointer-events-none">
       <div ref={dotRef} className="target-cursor-dot" style={{ backgroundColor: cursorColor }} />
       <div className="target-cursor-corner corner-tl" style={{ borderColor: cursorColor }} />
       <div className="target-cursor-corner corner-tr" style={{ borderColor: cursorColor }} />
