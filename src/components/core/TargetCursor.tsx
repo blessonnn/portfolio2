@@ -436,6 +436,9 @@ const TargetCursor = ({
     }
   }, [spinDuration, isMobile]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   if (isMobile) {
     return null;
   }
@@ -450,11 +453,9 @@ const TargetCursor = ({
     </div>
   );
 
-  if (typeof window !== "undefined") {
-    return createPortal(cursorContent, document.body);
-  }
+  if (!mounted) return null;
 
-  return cursorContent;
+  return createPortal(cursorContent, document.body);
 };
 
 export default TargetCursor;
