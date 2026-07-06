@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Blesson Portfolio",
   description: "A high-energy, cyber-minimalist portfolio",
   icons: {
-    icon: '/logo/logo-portfolio.png',
+    icon: '/logo/logo-portfolio.webp',
   },
 };
 
