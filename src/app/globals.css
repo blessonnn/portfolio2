@@ -88,7 +88,7 @@ html.lenis, html.lenis body {
   }
 }
 
-@keyframes marquee-ltr {
+@keyframes marquee {
   0% {
     transform: translate3d(-50%, 0, 0);
   }
@@ -97,10 +97,10 @@ html.lenis, html.lenis body {
   }
 }
 
-.animate-marquee-ltr {
+.animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee-ltr 22s linear infinite;
+  animation: marquee 22s linear infinite;
   will-change: transform;
 }
 

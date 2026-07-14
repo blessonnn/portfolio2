@@ -116,9 +116,9 @@ export default function SkillsSection() {
               <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-black/50 to-transparent pointer-events-none z-20" />
               <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-black/50 to-transparent pointer-events-none z-20" />
 
-              {/* Layer 1: Category Title (Visible by default, slides out to the right on hover) */}
+              {/* Layer 1: Category Title (Visible by default, slides out to the left on hover) */}
               <div 
-                className="absolute inset-x-0 w-full h-full flex items-center justify-between px-6 md:px-12 z-10 transition-all duration-750 ease-[cubic-bezier(0.16,1,0.3,1)] transform group-hover:translate-x-[20vw] group-hover:opacity-0 pointer-events-none"
+                className="absolute inset-x-0 w-full h-full flex items-center justify-between px-6 md:px-12 z-10 transition-all duration-750 ease-[cubic-bezier(0.16,1,0.3,1)] transform group-hover:-translate-x-[20vw] group-hover:opacity-0 pointer-events-none"
               >
                 <h3 className="text-xl md:text-3xl font-medium text-white transition-colors duration-300">
                   {category.title}
@@ -128,20 +128,21 @@ export default function SkillsSection() {
                 </span>
               </div>
 
-              {/* Layer 2: Skills Marquee (Hidden by default, slides in from the left to right on hover) */}
+              {/* Layer 2: Skills Marquee (Hidden by default, slides in from the right to left on hover) */}
               <div 
-                className="absolute inset-0 w-full h-full flex items-center z-10 transition-all duration-750 ease-[cubic-bezier(0.16,1,0.3,1)] transform -translate-x-[20vw] opacity-0 group-hover:translate-x-0 group-hover:opacity-100 pointer-events-none overflow-hidden"
+                className="absolute inset-0 w-full h-full flex items-center z-10 transition-all duration-750 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-x-[20vw] opacity-0 group-hover:translate-x-0 group-hover:opacity-100 pointer-events-none overflow-hidden"
               >
-                <div 
-                  className="flex whitespace-nowrap w-max animate-marquee-ltr text-2xl md:text-3xl font-bold text-black uppercase tracking-wider"
-                  style={{ animationDuration: `${duration}s` }}
+                <motion.div 
+                  className="flex whitespace-nowrap w-max text-2xl md:text-3xl font-bold text-black uppercase tracking-wider"
+                  animate={{ x: ["0%", "-50%"] }}
+                  transition={{ ease: "linear", duration: duration, repeat: Infinity }}
                 >
                   {/* Repeated blocks to support seamless wide displays */}
                   <span className="px-8">{skillsString} &nbsp; &bull; &nbsp;</span>
                   <span className="px-8">{skillsString} &nbsp; &bull; &nbsp;</span>
                   <span className="px-8">{skillsString} &nbsp; &bull; &nbsp;</span>
                   <span className="px-8">{skillsString} &nbsp; &bull; &nbsp;</span>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           );
